@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>637</width>
+    <height>173</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>637</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuUMA">
+    <property name="title">
+     <string>UMA</string>
+    </property>
+    <addaction name="actionInsert"/>
+    <addaction name="actionEdit"/>
+    <addaction name="actionDownloader"/>
+    <addaction name="actionBatch_Insert"/>
+    <addaction name="actionEXPORT"/>
+   </widget>
+   <addaction name="menuUMA"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionUMA">
+   <property name="text">
+    <string>UMA</string>
+   </property>
+  </action>
+  <action name="actionSUSPEND">
+   <property name="text">
+    <string>SUSPEND</string>
+   </property>
+  </action>
+  <action name="actionUNSUSPEND">
+   <property name="text">
+    <string>UNSUSPEND</string>
+   </property>
+  </action>
+  <action name="actionInsert">
+   <property name="text">
+    <string>Insert</string>
+   </property>
+  </action>
+  <action name="actionEdit">
+   <property name="text">
+    <string>Edit</string>
+   </property>
+  </action>
+  <action name="actionDownloader">
+   <property name="text">
+    <string>Downloader</string>
+   </property>
+  </action>
+  <action name="actionBatch_Insert">
+   <property name="text">
+    <string>Batch Insert</string>
+   </property>
+  </action>
+  <action name="actionEXPORT">
+   <property name="text">
+    <string>EXPORT</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
