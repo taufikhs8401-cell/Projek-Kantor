@@ -3,6 +3,8 @@ import sys
 import time
 from datetime import datetime
 import sqlite3
+import re
+
 
 import pdfplumber
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
@@ -99,7 +101,6 @@ class Ui_MainWindow(object):
         if self.form_edit is not None:
             self.form_edit.hide()
 
-
     def buka_data_export(self):
 
     # Sembunyikan semua form lain
@@ -187,30 +188,54 @@ class ExportWindow(QtWidgets.QMainWindow):
         if hasattr(self, 'lbl_target'):
             self.lbl_target.setText(self.output_folder)
 
-    
     def buka_data_downloader(self):
         self.form_downloader 
         self.form_downloader = DownloaderWindow()
         self.form_downloader.setWindowTitle("UMA Downloader")
         self.form_downloader.show()
-            
 
     def buka_data_batch_insert(self):
         self.form_batch_insert = BatchInsertWindow()
         self.form_batch_insert.setWindowTitle("Batch Insert")
         self.form_batch_insert.show()
 
-
     def buka_data_edit(self):
         self.form_edit = EditWindow()
         self.form_edit.setWindowTitle("Edit Data")
         self.form_edit.show()
 
+    def rapikan_teks(self, text):
+        # Gabungkan semua baris menjadi satu
+        text = text.replace("\n", " ")
+        text = re.sub(r"\s+", " ", text)
+
+        # Pecah menjadi paragraf
+        text = text.replace(
+            "Dalam rangka perlindungan Investor",
+            "\n\nDalam rangka perlindungan Investor"
+        )
+
+        text = text.replace(
+            "Pengumuman Unusual Market Activity",
+            "\n\nPengumuman Unusual Market Activity"
+        )
+
+        text = text.replace(
+            "Sehubungan dengan terjadinya Unusual Market Activity",
+            "\n\nSehubungan dengan terjadinya Unusual Market Activity"
+        )
+
+        # Poin tetap per baris
+        text = re.sub(r"\s([a-d]\.)", r"\n\1", text)
+
+        # Kalimat terakhir dibuat paragraf baru
+        text = text.replace(
+            "Seluruh keterbukaan informasi",
+            "\n\nSeluruh keterbukaan informasi"
+        )
+
+        return text.strip()
     
-
-
-    
-
     def btn_export_clicked(self):
         """Konversi semua file PDF dari folder sumber ke TXT di folder tujuan"""
         
@@ -249,12 +274,26 @@ class ExportWindow(QtWidgets.QMainWindow):
                 # Baca PDF dan ekstrak teks
                 with pdfplumber.open(pdf_path) as pdf:
                     full_text = []
-                    for page_num, page in enumerate(pdf.pages, start=1):
+                    if len(pdf.pages) >= 2:
+
+                        page = pdf.pages[1]          # Halaman Bahasa Indonesia
                         text = page.extract_text()
+
                         if text:
-                            full_text.append(f"===== Page {page_num} =====\n{text}")
-                        else:
-                            full_text.append(f"===== Page {page_num} =====\n[No text extracted]")
+
+                            # Awal teks yang ingin diambil
+                            start = text.find("PENGUMUMAN")
+
+                            # Akhir teks yang ingin diambil
+                            end = text.find("website Bursa (www.idx.co.id).")
+
+                            if start != -1 and end != -1:
+                                hasil = text[start:end + len("website Bursa (www.idx.co.id).")]
+
+                                hasil = self.rapikan_teks(hasil)
+
+                                full_text.append(hasil)
+                       
                 
                 # Simpan ke file TXT
                 with open(txt_path, "w", encoding="utf-8") as txt_file:
@@ -263,12 +302,9 @@ class ExportWindow(QtWidgets.QMainWindow):
                 
                 success_count += 1
                 
-                
-                
             except Exception as e:
                 fail_count += 1
                 
-        
         # Tampilkan hasil
         summary = f"Konversi Selesai!\n\n Berhasil: {success_count} file\n\n Gagal: {fail_count}"
         
@@ -309,24 +345,16 @@ class DownloaderWindow(QtWidgets.QMainWindow):
         self.form_export.setWindowTitle("Export Data")
         self.form_export.show()
         
-        
-        
-
     def buka_data_batch_insert(self):
         self.form_batch_insert = BatchInsertWindow()
         self.form_batch_insert.setWindowTitle("Batch Insert")
         self.form_batch_insert.show()
 
-        
-
     def buka_data_edit(self):
         self.form_edit = EditWindow()
         self.form_edit.setWindowTitle("Edit Data")
         self.form_edit.show()
-
-
-        
-        
+ 
     def setup_chrome_options(self, download_path):
         """Setup Chrome options for automatic downloading"""
         chrome_options = Options()
@@ -536,6 +564,7 @@ class BatchInsertWindow(QtWidgets.QMainWindow):
         super() .__init__()
         uic.loadUi("D:/CODING/suspend/batch_insert.ui", self)
         self.setWindowTitle("Batch Insert")
+        self.btn_import.clicked.connect(self.browse_folder)
 
         self.MainWindow = MainWindow
         self.form_export = None
@@ -552,23 +581,19 @@ class BatchInsertWindow(QtWidgets.QMainWindow):
         self.form_export.setWindowTitle("Export Data")
         self.form_export.show()
         
-        
-        
-        
     def buka_data_downloader(self):
         self.form_downloader 
         self.form_downloader = DownloaderWindow()
         self.form_downloader.setWindowTitle("UMA Downloader")
         self.form_downloader.show()
             
-        
     def buka_data_edit(self):
         self.form_edit = EditWindow()
         self.form_edit.setWindowTitle("Edit Data")
         self.form_edit.show()
 
         
-        self.btn_import.clicked.connect(self.browse_folder)
+        
 
     def browse_folder(self):
         folder = QFileDialog.getExistingDirectory(
@@ -603,27 +628,16 @@ class EditWindow(QtWidgets.QMainWindow):
         self.form_export.setWindowTitle("Export Data")
         self.form_export.show()
         
-        
-        
-        
-        
     def buka_data_downloader(self):
         self.form_downloader 
         self.form_downloader = DownloaderWindow()
         self.form_downloader.setWindowTitle("UMA Downloader")
         self.form_downloader.show()
             
-        
-        
-
     def buka_data_batch_insert(self):
         self.form_batch_insert = BatchInsertWindow()
         self.form_batch_insert.setWindowTitle("Batch Insert")
         self.form_batch_insert.show()
-
-        
-        
-
 
 if __name__ == "__main__":
     import sys
