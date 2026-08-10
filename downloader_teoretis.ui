@@ -174,7 +174,7 @@
   </action>
   <action name="actionDownloader_Teoretis">
    <property name="text">
-    <string>Downloader</string>
+    <string>Downloader Teoretis</string>
    </property>
   </action>
   <action name="actionEXPORT_Teoretis">

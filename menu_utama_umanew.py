@@ -4,8 +4,6 @@ import time
 from datetime import datetime
 import sqlite3
 import re
-
-
 import pdfplumber
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from PyQt5.QtCore import QDate
@@ -19,150 +17,70 @@ from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(637, 173)
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
-        self.centralwidget.setObjectName("centralwidget")
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 637, 18))
-        self.menubar.setObjectName("menubar")
-        self.menuUMA = QtWidgets.QMenu(self.menubar)
-        self.menuUMA.setObjectName("menuUMA")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
-        self.actionUMA = QtWidgets.QAction(MainWindow)
-        self.actionUMA.setObjectName("actionUMA")
-        self.actionSUSPEND = QtWidgets.QAction(MainWindow)
-        self.actionSUSPEND.setObjectName("actionSUSPEND")
-        self.actionUNSUSPEND = QtWidgets.QAction(MainWindow)
-        self.actionUNSUSPEND.setObjectName("actionUNSUSPEND")
-        self.actionInsert = QtWidgets.QAction(MainWindow)
-        self.actionInsert.setObjectName("actionInsert")
-        self.actionEdit = QtWidgets.QAction(MainWindow)
-        self.actionEdit.setObjectName("actionEdit")
-        self.actionDownloader = QtWidgets.QAction(MainWindow)
-        self.actionDownloader.setObjectName("actionDownloader")
-        self.actionBatch_Insert = QtWidgets.QAction(MainWindow)
-        self.actionBatch_Insert.setObjectName("actionBatch_Insert")
-        self.actionEXPORT = QtWidgets.QAction(MainWindow)
-        self.actionEXPORT.setObjectName("actionEXPORT")
-        self.menuUMA.addAction(self.actionInsert)
-        self.menuUMA.addAction(self.actionEdit)
-        self.menuUMA.addAction(self.actionDownloader)
-        self.menuUMA.addAction(self.actionBatch_Insert)
-        self.menuUMA.addAction(self.actionEXPORT)
-        self.menubar.addAction(self.menuUMA.menuAction())
 
-        self.MainWindow = MainWindow
+class Ui_MainWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        uic.loadUi("D:/CODING/suspend/menu_utama_uma.ui", self)
+        self.setWindowTitle("Menu Utama UMA")
 
         self.form_export = None
         self.form_downloader = None
         self.form_batch_insert = None
         self.form_edit = None
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
-        
-
-    def retranslateUi(self, MainWindow):
-        _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.menuUMA.setTitle(_translate("MainWindow", "UMA"))
-        self.actionUMA.setText(_translate("MainWindow", "UMA"))
-        self.actionSUSPEND.setText(_translate("MainWindow", "SUSPEND"))
-        self.actionUNSUSPEND.setText(_translate("MainWindow", "UNSUSPEND"))
-        self.actionInsert.setText(_translate("MainWindow", "Insert"))
-        self.actionEdit.setText(_translate("MainWindow", "Edit"))
-        self.actionDownloader.setText(_translate("MainWindow", "Downloader"))
-        self.actionBatch_Insert.setText(_translate("MainWindow", "Batch Insert"))
-        self.actionEXPORT.setText(_translate("MainWindow", "EXPORT"))
-        
+        self.form_downloader_teoretis = None
+        self.form_export_2 = None
+       
         #untuk menghubungan menu dengan fungsi
         self.actionEXPORT.triggered.connect(self.buka_data_export)
         self.actionDownloader.triggered.connect(self.buka_data_downloader)
         self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
         self.actionEdit.triggered.connect(self.buka_data_edit)
+        self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
+        self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)      
 
-    def hide_all_forms(self):
-
-        if self.form_export is not None:
-            self.form_export.hide()
-
-        if self.form_downloader is not None:
-            self.form_downloader.hide()
-
-        if self.form_batch_insert is not None:
-            self.form_batch_insert.hide()
-
-        if self.form_edit is not None:
-            self.form_edit.hide()
 
     def buka_data_export(self):
-
-    # Sembunyikan semua form lain
-        self.hide_all_forms()
-
-        # Sembunyikan Main Menu
-        self.MainWindow.hide()
-
-    # Jika Export belum pernah dibuat
         if self.form_export is None:
             self.form_export = ExportWindow()
-            self.form_export.setWindowTitle("Export Data")
 
-        # Jika sudah ada, cukup tampilkan lagi
         self.form_export.show()
-        self.form_export.raise_()
-        self.form_export.activateWindow()
-        
+        self.hide()
         
     def buka_data_downloader(self):
-
-        self.hide_all_forms()
-
-        self.MainWindow.hide()
-
         if self.form_downloader is None:
             self.form_downloader = DownloaderWindow()
-            self.form_downloader.setWindowTitle("UMA Downloader")
 
         self.form_downloader.show()
-        self.form_downloader.raise_()
-        self.form_downloader.activateWindow()
+        self.hide()
 
     def buka_data_batch_insert(self):
-        
-        self.hide_all_forms()
-
-        self.MainWindow.hide()
-
         if self.form_batch_insert is None:
             self.form_batch_insert = BatchInsertWindow()
-            self.form_batch_insert.setWindowTitle("Batch Insert")
 
         self.form_batch_insert.show()
-        self.form_batch_insert.raise_()
-        self.form_batch_insert.activateWindow()
+        self.hide()
 
     def buka_data_edit(self):
-        self.hide_all_forms()
-
-        self.MainWindow.hide()
-
         if self.form_edit is None:
             self.form_edit = EditWindow()
-            self.form_edit.setWindowTitle("Edit Data")
 
         self.form_edit.show()
-        self.form_edit.raise_()
-        self.form_edit.activateWindow()
+        self.hide()
 
-        
+    def buka_data_downloader_teoretis(self):
+        if self.form_downloader_teoretis is None:
+            self.form_downloader_teoretis = DownloaderTeoretisWindow()
 
+        self.form_downloader_teoretis.show()
+        self.hide()
+
+    def buka_data_export_teoretis(self):
+        if self.form_export_teoretis is None:
+            self.form_export_teoretis = ExportWindow()
+
+        self.form_export_teoretis.show()
+        self.hide()
 
 
 class ExportWindow(QtWidgets.QMainWindow):
@@ -170,11 +88,6 @@ class ExportWindow(QtWidgets.QMainWindow):
         super(ExportWindow, self).__init__()
         uic.loadUi("D:/CODING/suspend/export.ui", self)
         self.setWindowTitle("Export Data")
-
-        self.actionDownloader.triggered.connect(self.buka_data_downloader)
-        self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
-        self.actionEdit.triggered.connect(self.buka_data_edit)
-
         # Inisialisasi folder
         self.source_folder = r"D:/UMA/download_uma"
         self.output_folder = r"D:/UMA/txt_uma"
@@ -187,9 +100,22 @@ class ExportWindow(QtWidgets.QMainWindow):
             self.lbl_source.setText(self.source_folder)
         if hasattr(self, 'lbl_target'):
             self.lbl_target.setText(self.output_folder)
+        
+        self.form_downloader = None
+        self.form_downloader_teoretis = None
+        self.form_batch_insert = None
+        self.form_edit = None
+        self.form_export_teoretis = None
+        
+        self.actionDownloader.triggered.connect(self.buka_data_downloader)
+        self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
+        self.actionEdit.triggered.connect(self.buka_data_edit)
+        self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
+        self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
+        
 
     def buka_data_downloader(self):
-        self.form_downloader 
+        
         self.form_downloader = DownloaderWindow()
         self.form_downloader.setWindowTitle("UMA Downloader")
         self.form_downloader.show()
@@ -203,6 +129,18 @@ class ExportWindow(QtWidgets.QMainWindow):
         self.form_edit = EditWindow()
         self.form_edit.setWindowTitle("Edit Data")
         self.form_edit.show()
+
+    def buka_data_downloader_teoretis(self):
+        self.form_downloader_teoretis = DownloaderTeoretisWindow()
+        self.form_downloader_teoretis.setWindowTitle("Downloader Teoretis")
+        self.form_downloader_teoretis.show()
+
+    def buka_data_export_teoretis(self):
+        self.form_export_teoretis = ExportTeoretisWindow()
+        self.form_export_teoretis.setWindowTitle("Export Teoretis")
+        self.form_export_teoretis.show()
+
+        
 
     def rapikan_teks(self, text):
         # Gabungkan semua baris menjadi satu
@@ -327,18 +265,20 @@ class DownloaderWindow(QtWidgets.QMainWindow):
         self.setWindowTitle("UMA Downloader")
         # Set default date to current date
         self.date_edit.setDate(QDate.currentDate())
-
         self.btn_run.clicked.connect(self.btn_run_clicked)
        
-        self.MainWindow = MainWindow
         self.form_export = None
-        
+        self.form_downloader_teoretis = None
         self.form_batch_insert = None
         self.form_edit = None
+        self.form_export_teoretis = None
+        
         self.actionEXPORT.triggered.connect(self.buka_data_export)
+        self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
         self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
         self.actionEdit.triggered.connect(self.buka_data_edit)
-
+        self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
+       
     def buka_data_export(self):
         self.form_export 
         self.form_export = ExportWindow()
@@ -354,7 +294,18 @@ class DownloaderWindow(QtWidgets.QMainWindow):
         self.form_edit = EditWindow()
         self.form_edit.setWindowTitle("Edit Data")
         self.form_edit.show()
- 
+
+    def buka_data_downloader_teoretis(self):
+        self.form_downloader_teoretis = DownloaderTeoretisWindow()
+        self.form_downloader_teoretis.setWindowTitle("Downloader Teoretis")
+        self.form_downloader_teoretis.show()
+
+    def buka_data_export_teoretis(self):
+        self.form_export_teoretis = ExportTeoretisWindow()
+        self.form_export_teoretis.setWindowTitle("Export Teoretis")
+        self.form_export_teoretis.show()
+
+
     def setup_chrome_options(self, download_path):
         """Setup Chrome options for automatic downloading"""
         chrome_options = Options()
@@ -566,20 +517,29 @@ class BatchInsertWindow(QtWidgets.QMainWindow):
         self.setWindowTitle("Batch Insert")
         self.btn_import.clicked.connect(self.browse_folder)
 
-        self.MainWindow = MainWindow
-        self.form_export = None
-        self.form_downloader = None
         
+        self.form_export = None
+        self.form_downloader_teoretis = None
+        self.form_downloader = None
         self.form_edit = None
+        self.form_export_teoretis = None
+        
         self.actionEXPORT.triggered.connect(self.buka_data_export)
+        self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
         self.actionDownloader.triggered.connect(self.buka_data_downloader)
         self.actionEdit.triggered.connect(self.buka_data_edit)
+        self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
 
     def buka_data_export(self):
         self.form_export 
         self.form_export = ExportWindow()
         self.form_export.setWindowTitle("Export Data")
         self.form_export.show()
+
+    def buka_data_downloader_teoretis(self):
+        self.form_downloader_teoretis = DownloaderTeoretisWindow()
+        self.form_downloader_teoretis.setWindowTitle("Downloader Teoretis")
+        self.form_downloader_teoretis.show()
         
     def buka_data_downloader(self):
         self.form_downloader 
@@ -592,8 +552,11 @@ class BatchInsertWindow(QtWidgets.QMainWindow):
         self.form_edit.setWindowTitle("Edit Data")
         self.form_edit.show()
 
-        
-        
+    def buka_data_export_teoretis(self):
+        self.form_export_teoretis = ExportTeoretisWindow()
+        self.form_export_teoretis.setWindowTitle("Export Teoretis")
+        self.form_export_teoretis.show()
+
 
     def browse_folder(self):
         folder = QFileDialog.getExistingDirectory(
@@ -605,28 +568,35 @@ class BatchInsertWindow(QtWidgets.QMainWindow):
             self.txt_path.setText(folder)
         
 
-       
-
 class EditWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super() .__init__()
         uic.loadUi("D:/CODING/suspend/menu_edit.ui", self)
         self.setWindowTitle("Edit Data")
 
-        self.MainWindow = MainWindow
+       
         self.form_export = None
+        self.form_downloader_teoretis = None
         self.form_downloader = None
         self.form_batch_insert = None
+        self.form_export_teoretis = None
         
         self.actionEXPORT.triggered.connect(self.buka_data_export)
+        self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
         self.actionDownloader.triggered.connect(self.buka_data_downloader)
         self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
+        self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
     
     def buka_data_export(self):
         self.form_export 
         self.form_export = ExportWindow()
         self.form_export.setWindowTitle("Export Data")
         self.form_export.show()
+
+    def buka_data_downloader_teoretis(self):
+        self.form_downloader_teoretis = DownloaderTeoretisWindow()
+        self.form_downloader_teoretis.setWindowTitle("Downloader Teoretis")
+        self.form_downloader_teoretis.show()
         
     def buka_data_downloader(self):
         self.form_downloader 
@@ -639,11 +609,110 @@ class EditWindow(QtWidgets.QMainWindow):
         self.form_batch_insert.setWindowTitle("Batch Insert")
         self.form_batch_insert.show()
 
+    def buka_data_export_teoretis(self):
+        self.form_export_teoretis = ExportTeoretisWindow()
+        self.form_export_teoretis.setWindowTitle("Export Teoretis")
+        self.form_export_teoretis.show()
+
+
+class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super(DownloaderTeoretisWindow, self).__init__()
+        uic.loadUi("D:/CODING/suspend/downloader_teoretis.ui", self)
+        self.setWindowTitle("Downloader Teoretis")
+        # Set default date to current date
+        self.date_edit.setDate(QDate.currentDate())
+
+        self.form_export = None
+        self.form_batch_insert = None
+        self.form_downloader = None
+        self.form_edit = None
+        self.form_export_teoretis = None
+        
+        self.actionEXPORT.triggered.connect(self.buka_data_export)
+        self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
+        self.actionDownloader.triggered.connect(self.buka_data_downloader)
+        self.actionEdit.triggered.connect(self.buka_data_edit)
+        self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
+        
+    
+    def buka_data_export(self):
+        self.form_export 
+        self.form_export = ExportWindow()
+        self.form_export.setWindowTitle("Export Data")
+        self.form_export.show()
+        
+    def buka_data_batch_insert(self):
+        self.form_batch_insert = BatchInsertWindow()
+        self.form_batch_insert.setWindowTitle("Batch Insert")
+        self.form_batch_insert.show()
+
+    def buka_data_edit(self):
+        self.form_edit = EditWindow()
+        self.form_edit.setWindowTitle("Edit Data")
+        self.form_edit.show()
+
+    def buka_data_downloader(self):
+        self.form_downloader 
+        self.form_downloader = DownloaderWindow()
+        self.form_downloader.setWindowTitle("UMA Downloader")
+        self.form_downloader.show()
+
+    def buka_data_export_teoretis(self):
+        self.form_export_teoretis = ExportTeoretisWindow()
+        self.form_export_teoretis.setWindowTitle("Export Teoretis")
+        self.form_export_teoretis.show()
+
+class ExportTeoretisWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super(ExportTeoretisWindow, self).__init__()
+        uic.loadUi("D:/CODING/suspend/export_teoretis.ui", self)
+        self.setWindowTitle("Export Teoretis")
+
+        self.form_export = None
+        self.form_downloader = None
+        self.form_batch_insert = None
+        self.form_edit = None
+        self.form_downloader_teoretis = None
+        
+        self.actionEXPORT.triggered.connect(self.buka_data_export)
+        self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
+        self.actionEdit.triggered.connect(self.buka_data_edit)
+        self.actionDownloader.triggered.connect(self.buka_data_downloader)
+        self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
+    
+    def buka_data_export(self):
+        self.form_export 
+        self.form_export = ExportWindow()
+        self.form_export.setWindowTitle("Export Data")
+        self.form_export.show()
+        
+    def buka_data_batch_insert(self):
+        self.form_batch_insert = BatchInsertWindow()
+        self.form_batch_insert.setWindowTitle("Batch Insert")
+        self.form_batch_insert.show()
+
+    def buka_data_edit(self):
+        self.form_edit = EditWindow()
+        self.form_edit.setWindowTitle("Edit Data")
+        self.form_edit.show()
+
+    def buka_data_downloader(self):
+        self.form_downloader 
+        self.form_downloader = DownloaderWindow()
+        self.form_downloader.setWindowTitle("UMA Downloader")
+        self.form_downloader.show()
+
+    def buka_data_downloader_teoretis(self):
+        self.form_downloader_teoretis = DownloaderTeoretisWindow()
+        self.form_downloader_teoretis.setWindowTitle("Downloader Teoretis")
+        self.form_downloader_teoretis.show()
+
+    
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
+
+    window = Ui_MainWindow()
+    window.show()
+
     sys.exit(app.exec_())

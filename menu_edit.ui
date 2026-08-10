@@ -49,7 +49,7 @@
      <x>0</x>
      <y>0</y>
      <width>637</width>
-     <height>18</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuUMA">
@@ -62,7 +62,15 @@
     <addaction name="actionBatch_Insert"/>
     <addaction name="actionEXPORT"/>
    </widget>
+   <widget class="QMenu" name="menuTeoretis">
+    <property name="title">
+     <string>Teoretis</string>
+    </property>
+    <addaction name="actionDownloader_Teoretis"/>
+    <addaction name="actionEXPORT_Teoretis"/>
+   </widget>
    <addaction name="menuUMA"/>
+   <addaction name="menuTeoretis"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionUMA">
@@ -101,6 +109,16 @@
    </property>
   </action>
   <action name="actionEXPORT">
+   <property name="text">
+    <string>EXPORT</string>
+   </property>
+  </action>
+  <action name="actionDownloader_Teoretis">
+   <property name="text">
+    <string>Downloader</string>
+   </property>
+  </action>
+  <action name="actionEXPORT_Teoretis">
    <property name="text">
     <string>EXPORT</string>
    </property>
