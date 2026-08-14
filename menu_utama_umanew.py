@@ -4,6 +4,7 @@ import time
 from datetime import datetime
 import sqlite3
 import re
+import requests
 import pdfplumber
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from PyQt5.QtCore import QDate
@@ -115,7 +116,6 @@ class ExportWindow(QtWidgets.QMainWindow):
         
 
     def buka_data_downloader(self):
-        
         self.form_downloader = DownloaderWindow()
         self.form_downloader.setWindowTitle("UMA Downloader")
         self.form_downloader.show()
@@ -139,8 +139,6 @@ class ExportWindow(QtWidgets.QMainWindow):
         self.form_export_teoretis = ExportTeoretisWindow()
         self.form_export_teoretis.setWindowTitle("Export Teoretis")
         self.form_export_teoretis.show()
-
-        
 
     def rapikan_teks(self, text):
         # Gabungkan semua baris menjadi satu
@@ -280,7 +278,6 @@ class DownloaderWindow(QtWidgets.QMainWindow):
         self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
        
     def buka_data_export(self):
-        self.form_export 
         self.form_export = ExportWindow()
         self.form_export.setWindowTitle("Export Data")
         self.form_export.show()
@@ -349,7 +346,8 @@ class DownloaderWindow(QtWidgets.QMainWindow):
             return
 
         latest_file = max(pdf_files, key=os.path.getctime)
-
+        
+        
         safe_filename = "".join(
             c for c in new_filename
             if c.isalnum() or c in (" ", "-", "_", ".")
@@ -379,6 +377,25 @@ class DownloaderWindow(QtWidgets.QMainWindow):
         # Get selected date from UI
         selected_date = self.date_edit.date()
         target_date = selected_date.toString("dd MMM yyyy")
+
+        #konversi target_date ke format yang sesuai dengan halaman web
+        bulan_inggris = {
+            "Jan": "Jan",
+            "Feb": "Feb",
+            "Mar": "Mar",
+            "Apr": "Apr",
+            "May": "Mei",
+            "Jun": "Jun",
+            "Jul": "Jul",
+            "Aug": "Agt",
+            "Sep": "Sep",
+            "Oct": "Okt",
+            "Nov": "Nov",
+            "Dec": "Des"
+        }
+
+        for en, idn in bulan_inggris.items():
+            target_date = target_date.replace(en, idn)
         print(f"Target date: {target_date}")
         
         # Setup Chrome options
@@ -517,7 +534,6 @@ class BatchInsertWindow(QtWidgets.QMainWindow):
         self.setWindowTitle("Batch Insert")
         self.btn_import.clicked.connect(self.browse_folder)
 
-        
         self.form_export = None
         self.form_downloader_teoretis = None
         self.form_downloader = None
@@ -574,7 +590,6 @@ class EditWindow(QtWidgets.QMainWindow):
         uic.loadUi("D:/CODING/suspend/menu_edit.ui", self)
         self.setWindowTitle("Edit Data")
 
-       
         self.form_export = None
         self.form_downloader_teoretis = None
         self.form_downloader = None
@@ -622,6 +637,7 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
         self.setWindowTitle("Downloader Teoretis")
         # Set default date to current date
         self.date_edit.setDate(QDate.currentDate())
+        self.btn_run_2.clicked.connect(self.btn_run_2_clicked)
 
         self.form_export = None
         self.form_batch_insert = None
@@ -635,7 +651,6 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
         self.actionEdit.triggered.connect(self.buka_data_edit)
         self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
         
-    
     def buka_data_export(self):
         self.form_export 
         self.form_export = ExportWindow()
@@ -662,6 +677,196 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
         self.form_export_teoretis = ExportTeoretisWindow()
         self.form_export_teoretis.setWindowTitle("Export Teoretis")
         self.form_export_teoretis.show()
+
+    def setup_chrome_options(self, download_path):
+        """Setup Chrome options for automatic downloading"""
+        chrome_options = Options()
+
+        prefs = {
+            "download.default_directory": download_path,
+            "download.prompt_for_download": False,
+            "download.directory_upgrade": True,
+            "plugins.always_open_pdf_externally": True,
+            "profile.default_content_setting_values.popups": 0,
+            "profile.default_content_setting_values.automatic_downloads": 1
+        }
+
+        chrome_options.add_experimental_option("prefs", prefs)
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--start-maximized")
+        # Add user agent to avoid detection
+        chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                
+        return chrome_options
+    def rename_latest_pdf(folder, new_filename):
+        pdf_files = [
+            os.path.join(folder, f)
+            for f in os.listdir(folder)
+            if f.lower().endswith(".pdf")
+        ]
+
+        if not pdf_files:
+            return
+
+        latest_file = max(pdf_files, key=os.path.getctime)
+        
+        safe_filename = "".join(
+            c for c in new_filename
+            if c.isalnum() or c in (" ", "-", ".")
+        )
+
+        new_path = os.path.join(folder, safe_filename)
+
+        counter = 1
+        while os.path.exists(new_path):
+            name, ext = os.path.splitext(safe_filename)
+            new_path = os.path.join(
+                folder,
+                f"{name}_{counter}{ext}"
+            )
+            counter += 1
+
+        os.rename(latest_file, new_path)
+
+        print(f"Saved : {os.path.basename(new_path)}")
+
+
+    def btn_run_2_clicked(self):
+        # Konfigurasi
+        keywords = ["Harga Teoretis"]
+        download_path = os.path.abspath("D:/Teoretis/download_teoretis")
+        os.makedirs(download_path, exist_ok=True)
+        
+        # Format tanggal
+        # Get selected date from UI
+        selected_date = self.date_edit.date()
+        target_date = selected_date.toString("dd MMM yyyy")
+
+        #konversi target_date ke format yang sesuai dengan halaman web
+        bulan_lengkap = {
+            "Jan": "Januari",
+            "Feb": "Februari",
+            "Mar": "Maret",
+            "Apr": "April",
+            "May": "Mei",
+            "Jun": "Juni",
+            "Jul": "Juli",
+            "Aug": "Agustus",
+            "Sep": "September",
+            "Oct": "Oktober",
+            "Nov": "November",
+            "Dec": "Desember"
+        }
+
+        for en, idn in bulan_lengkap.items():
+            target_date = target_date.replace(en, idn)
+        print(f"Target date: {target_date}")
+        
+        # Setup driver
+        chrome_options = self.setup_chrome_options(download_path)
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), 
+                                options=chrome_options)
+        wait = WebDriverWait(driver, 30)
+        
+        try:
+            # Buka halaman
+            url = "https://www.idx.co.id/id/perusahaan-tercatat/keterbukaan-informasi/"
+            driver.get(url)
+            time.sleep(5)
+
+            wait = WebDriverWait(driver, 30)
+            time.sleep(5)  # Additional wait for dynamic content
+
+            # Loop halaman
+            page = 1
+            found = False
+
+            # Cari setiap keyword
+            for keyword in keywords:
+                print(f"\nMencari: {keyword} | Tanggal: {target_date}")
+                
+                # Input keyword
+                keyword_input = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='Kata kunci...']")))
+                keyword_input.clear()
+                keyword_input.send_keys(keyword)
+                time.sleep(4)
+                
+                while page <= 50 and not found:
+                    print(f"Halaman {page}...")
+                    
+                    try:
+                        rows = driver.find_elements(By.XPATH, "//table[@id='vgt-table']/tbody/tr")
+                        print(f"total rows found: {len(rows)}")
+                        time.sleep(1)
+                        
+                        for row in rows:
+                            row_text = row.text.strip().replace("\n", " ")
+                            
+                            # Cek tanggal (multiple format)
+                            if not any(fmt in row_text for fmt in [
+                                target_date,
+                                self.date_edit.date().toString("dd/MM/yyyy"),
+                                self.date_edit.date().toString("yyyy-MM-dd")
+                            ]):
+                                continue
+                            
+                            print("✓ Tanggal cocok!")
+                            
+                            # Cari link PDF
+                            pdf_link = None
+                            for link in row.find_elements(By.XPATH, './/a[contains(@href, ".pdf")]'):
+                                href = link.get_attribute("href")
+                                if href and (".pdf" in href.lower() or "download" in href.lower()):
+                                    pdf_link = href
+                                    break
+                            
+                            # Cari tombol download
+                            if not pdf_link:
+                                for btn in row.find_elements(By.XPATH, ".//button"):
+                                    if ("download" in btn.text.lower() or 
+                                        "download" in (btn.get_attribute("aria-label") or "").lower()):
+                                        # Klik tombol
+                                        before = set(os.listdir(download_path))
+                                        driver.execute_script("arguments[0].click();", btn)
+                                        if self.wait_for_download(download_path, before, 60):
+                                            print("✓ Download berhasil!")
+                                            found = True
+                                        break
+                            
+                            # Download via link
+                            if pdf_link and not found:
+                                before = set(os.listdir(download_path))
+                                driver.get(pdf_link)
+                                if self.wait_for_download(download_path, before, 60):
+                                    print("✓ Download berhasil!")
+                                    found = True
+                        
+                        # Next page
+                        if not found:
+                            try:
+                                next_btn = driver.find_element(By.XPATH, "//button[contains(@class,'next')]")
+                                if next_btn.get_attribute("disabled"):
+                                    break
+                                driver.execute_script("arguments[0].click();", next_btn)
+                                page += 1
+                                time.sleep(3)
+                            except:
+                                break
+                                
+                    except Exception as e:
+                        print(f"Error halaman {page}: {e}")
+                        break
+                
+                print(f"{'✓' if found else '✗'} Data ditemukan: {found}")
+                
+        except Exception as e:
+            print(f"Error: {e}")
+        finally:
+            time.sleep(3)
+            driver.quit()
+            print("Selesai!")
 
 class ExportTeoretisWindow(QtWidgets.QMainWindow):
     def __init__(self):
