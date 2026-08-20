@@ -16,6 +16,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.common.exceptions import (TimeoutException, NoSuchElementException, StaleElementReferenceException)
 
 
 
@@ -678,6 +679,38 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
         self.form_export_teoretis.setWindowTitle("Export Teoretis")
         self.form_export_teoretis.show()
 
+    def wait_for_download_complete(self, folder, timeout=30):
+        """
+        Menunggu sampai proses download PDF selesai.
+        """
+
+        start_time = time.time()
+
+        while time.time() - start_time < timeout:
+
+            # Cek apakah masih ada file .crdownload
+            downloading_files = [
+                f for f in os.listdir(folder)
+                if f.lower().endswith(".crdownload")
+            ]
+
+            # Ambil file PDF
+            pdf_files = [
+                f for f in os.listdir(folder)
+                if f.lower().endswith(".pdf")
+            ]
+
+            # Jika tidak ada proses download yang sedang berjalan
+            # dan sudah ada file PDF
+            if not downloading_files and pdf_files:
+                print("Download selesai.")
+                return True
+
+            time.sleep(1)
+
+        print("Timeout: Download tidak selesai dalam waktu yang ditentukan.")
+        return False
+
     def setup_chrome_options(self, download_path):
         """Setup Chrome options for automatic downloading"""
         chrome_options = Options()
@@ -700,7 +733,8 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
         chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
                 
         return chrome_options
-    def rename_latest_pdf(folder, new_filename):
+    
+    def rename_latest_pdf(folder, kode_saham):
         pdf_files = [
             os.path.join(folder, f)
             for f in os.listdir(folder)
@@ -708,43 +742,52 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
         ]
 
         if not pdf_files:
+            print("Tidak ada file PDF ditemukan.")
             return
 
+        # Ambil file PDF yang paling baru
         latest_file = max(pdf_files, key=os.path.getctime)
-        
+
+        # Buat nama file
+        new_filename = f"Harga Teoretis_{kode_saham}.pdf"
+
+        # Bersihkan nama file
         safe_filename = "".join(
             c for c in new_filename
-            if c.isalnum() or c in (" ", "-", ".")
+            if c.isalnum() or c in (" ", "-", "_", ".")
         )
 
         new_path = os.path.join(folder, safe_filename)
 
+        # Jika file sudah ada
         counter = 1
+
         while os.path.exists(new_path):
             name, ext = os.path.splitext(safe_filename)
-            new_path = os.path.join(
-                folder,
-                f"{name}_{counter}{ext}"
-            )
-            counter += 1
 
+            new_path = os.path.join(folder, f"{name}_{counter}{ext}")
+
+            counter += 1
+        # Rename
         os.rename(latest_file, new_path)
 
-        print(f"Saved : {os.path.basename(new_path)}")
-
-
-    def btn_run_2_clicked(self):
-        # Konfigurasi
-        keywords = ["Harga Teoretis"]
-        download_path = os.path.abspath("D:/Teoretis/download_teoretis")
-        os.makedirs(download_path, exist_ok=True)
+        print(f"Saved: {os.path.basename(new_path)}")
         
-        # Format tanggal
-        # Get selected date from UI
+    
+    
+    def btn_run_2_clicked(self):
+        # KONFIGURASI
+        keywords = ["Harga Teoretis"]
+
+        download_path = os.path.abspath("D:/Teoretis/download_teoretis")
+
+        os.makedirs(download_path, exist_ok=True)
+
+        # AMBIL TANGGAL DARI UI
         selected_date = self.date_edit.date()
         target_date = selected_date.toString("dd MMM yyyy")
-
-        #konversi target_date ke format yang sesuai dengan halaman web
+       
+        # KONVERSI BULAN INGGRIS -> INDONESIA
         bulan_lengkap = {
             "Jan": "Januari",
             "Feb": "Februari",
@@ -761,112 +804,295 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
         }
 
         for en, idn in bulan_lengkap.items():
+
             target_date = target_date.replace(en, idn)
         print(f"Target date: {target_date}")
-        
-        # Setup driver
+       
+        # SETUP CHROME
         chrome_options = self.setup_chrome_options(download_path)
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), 
-                                options=chrome_options)
+
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
         wait = WebDriverWait(driver, 30)
-        
+
+        # VARIABLE
+        download_found = 0
+        found = False
+
         try:
-            # Buka halaman
-            url = "https://www.idx.co.id/id/perusahaan-tercatat/keterbukaan-informasi/"
+            # BUKA WEBSITE IDX
+            url = ("https://www.idx.co.id/id/perusahaan-tercatat/keterbukaan-informasi/")
             driver.get(url)
+            print("Membuka halaman IDX...")
             time.sleep(5)
 
-            wait = WebDriverWait(driver, 30)
-            time.sleep(5)  # Additional wait for dynamic content
-
-            # Loop halaman
-            page = 1
-            found = False
-
-            # Cari setiap keyword
+            # INPUT KEYWORD
             for keyword in keywords:
-                print(f"\nMencari: {keyword} | Tanggal: {target_date}")
-                
-                # Input keyword
-                keyword_input = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='Kata kunci...']")))
-                keyword_input.clear()
-                keyword_input.send_keys(keyword)
-                time.sleep(4)
-                
-                while page <= 50 and not found:
-                    print(f"Halaman {page}...")
-                    
+                print(
+                    f"\nMencari: {keyword} | "
+                    f"Tanggal: {target_date}"
+                )
+
+                try:
+                    keyword_input = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='Kata kunci...']")))
+                    keyword_input.clear()
+                    keyword_input.send_keys(keyword)
+
+                    print(
+                        f"Keyword '{keyword}' "
+                        f"berhasil dimasukkan"
+                    )
+
+                    # TEKAN ENTER
+                    keyword_input.send_keys("\n")
+                    time.sleep(3)
+
+                except Exception as e:
+                    print(f"Input keyword tidak ditemukan: "f"{e}")
+
+            
+            # KLIK TERAPKAN
+            terapkan_selectors = [
+                "//button[contains("
+                "normalize-space(.),"
+                "'Terapkan')]",
+
+                "//span[contains("
+                "normalize-space(.),"
+                "'Terapkan')]",
+
+                "//*[contains("
+                "normalize-space(.),"
+                "'Terapkan')]"
+            ]
+
+            terapkan_clicked = False
+
+            for selector in terapkan_selectors:
+                try:
+                    button = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, selector)))
+                    driver.execute_script("arguments[0].click();", button)
+
+                    print("Tombol Terapkan berhasil diklik.")
+                    terapkan_clicked = True
+                    time.sleep(5)
+
+                    break
+                except Exception:
+                    continue
+
+            if not terapkan_clicked:
+                print("Tombol Terapkan tidak ditemukan.")
+
+            
+
+                # AMBIL SEMUA ELEMEN TIME
+                time_elements = driver.find_elements(By.XPATH,"//time")
+
+                print(f"Total elemen tanggal ditemukan: "f"{len(time_elements)}")
+
+                if not time_elements:
+                    print("Tidak ada elemen tanggal ""di halaman ini.")
+
+                # LOOP SETIAP DATA
+                for i, time_element in enumerate(time_elements, 1):
                     try:
-                        rows = driver.find_elements(By.XPATH, "//table[@id='vgt-table']/tbody/tr")
-                        print(f"total rows found: {len(rows)}")
-                        time.sleep(1)
+                        # AMBIL TANGGAL
+                        row_date = (time_element.text.strip())
+
+                        print(f"Row {i}: Date = "f"{row_date}")
+
+                        # =========================================
+                        # AMBIL TANGGAL SAJA
+                        #
+                        # Contoh:
+                        #
+                        # 20 Juli 2026 21:00:00
+                        #
+                        # menjadi:
+                        #
+                        # 20 Juli 2026
+                        # =========================================
+
+                        match_date = re.search(
+                            r'(\d{1,2}\s+'
+                            r'[A-Za-z]+\s+'
+                            r'\d{4})',
+                            row_date
+                        )
+
+                        if not match_date:
+                            print("Format tanggal tidak ""dikenali.")
+                            continue
+
+                        row_date_only = (match_date.group(1).strip())
+
+                        print(f"Row {i}: Date Only = "f"{row_date_only}")
+
                         
-                        for row in rows:
-                            row_text = row.text.strip().replace("\n", " ")
-                            
-                            # Cek tanggal (multiple format)
-                            if not any(fmt in row_text for fmt in [
-                                target_date,
-                                self.date_edit.date().toString("dd/MM/yyyy"),
-                                self.date_edit.date().toString("yyyy-MM-dd")
-                            ]):
-                                continue
-                            
-                            print("✓ Tanggal cocok!")
-                            
-                            # Cari link PDF
-                            pdf_link = None
-                            for link in row.find_elements(By.XPATH, './/a[contains(@href, ".pdf")]'):
-                                href = link.get_attribute("href")
-                                if href and (".pdf" in href.lower() or "download" in href.lower()):
-                                    pdf_link = href
-                                    break
-                            
-                            # Cari tombol download
-                            if not pdf_link:
-                                for btn in row.find_elements(By.XPATH, ".//button"):
-                                    if ("download" in btn.text.lower() or 
-                                        "download" in (btn.get_attribute("aria-label") or "").lower()):
-                                        # Klik tombol
-                                        before = set(os.listdir(download_path))
-                                        driver.execute_script("arguments[0].click();", btn)
-                                        if self.wait_for_download(download_path, before, 60):
-                                            print("✓ Download berhasil!")
-                                            found = True
-                                        break
-                            
-                            # Download via link
-                            if pdf_link and not found:
-                                before = set(os.listdir(download_path))
-                                driver.get(pdf_link)
-                                if self.wait_for_download(download_path, before, 60):
-                                    print("✓ Download berhasil!")
-                                    found = True
+                        # BANDINGKAN TANGGAL
+                        if (row_date_only.lower()!= target_date.lower()):
+
+                            print(f"Row {i}: "f"tanggal tidak sesuai.")
+                            continue
+
+                        # TANGGAL DITEMUKAN
+                        print(f"\n*** TANGGAL DITEMUKAN ***")
+
+                        print(f"Target : {target_date}")
+
+                        print(f"Found  : {row_date_only}")
+
+                        # CARI CONTAINER DATA
+                        try:
+                            row = time_element.find_element(
+                                By.XPATH,
+                                "./ancestor::div["
+                                ".//a[contains("
+                                "@href,'.pdf') "
+                                "or contains("
+                                "@href,'.PDF')]"
+                                "][1]"
+                            )
+
+                        except NoSuchElementException:
+
+                            print("Container data tidak ""ditemukan.")
+                            continue
+
+                        # AMBIL TEKS ROW
+                        row_text = row.text.strip()
+
+                        print(f"Data row:\n{row_text}")
+
+                        # AMBIL KODE SAHAM
+                        # Contoh:
+                        # (MLPT)
+
+                        kode_saham = None
+
+                        match = re.search(
+                            r'\(([A-Z]{4})\)',
+                            row_text
+                        )
+
+                        if match:
+                            kode_saham = (match.group(1))
+                        else:
+                            match = re.search(
+                                r'\[([A-Z]{4})\]',
+                                row_text
+                            )
+
+                            if match:
+                                kode_saham = (match.group(1))
+
+                        if not kode_saham:
+                            print("Kode saham tidak ""ditemukan.")
+                            continue
+
+                        print(f"Kode saham: "f"{kode_saham}")
                         
-                        # Next page
-                        if not found:
-                            try:
-                                next_btn = driver.find_element(By.XPATH, "//button[contains(@class,'next')]")
-                                if next_btn.get_attribute("disabled"):
-                                    break
-                                driver.execute_script("arguments[0].click();", next_btn)
-                                page += 1
-                                time.sleep(3)
-                            except:
-                                break
-                                
-                    except Exception as e:
-                        print(f"Error halaman {page}: {e}")
+                        # CARI LINK PDF
+                        try:
+                            download_link = (row.find_element(By.XPATH,
+                                    ".//a[contains("
+                                    "@href,'.pdf') "
+                                    "or contains("
+                                    "@href,'.PDF')]"
+                                )
+                            )
+
+                        except NoSuchElementException:
+                            print("Link PDF tidak ditemukan.")
+                            continue
+
+                        print("Link PDF ditemukan.")
+
+                        
+                        # NAMA FILE
+                        filename = (f"Harga Teoretis_"f"{kode_saham}.pdf")
+
+                        print(f"Downloading: {filename}")
+
+                        # SIMPAN FILE SEBELUM DOWNLOAD
+                        existing_files = set(os.listdir(download_path))
+
+                        # KLIK PDF
+                        driver.execute_script("arguments[0].click();", download_link)
+
+                        print("Download dimulai...")
+
+                        # TUNGGU DOWNLOAD
+                        downloaded_file = (self.wait_for_download_complete(download_path, existing_files, timeout=30))
+
+                        if not downloaded_file:
+                            print("Download gagal ""atau timeout.")
+
+                            continue
+
+                        print(f"Download selesai: "f"{os.path.basename(downloaded_file)}")
+
+                        # RENAME
+                        renamed_file = (
+                            self.rename_latest_pdf(download_path, kode_saham, downloaded_file))
+
+                        if renamed_file:
+
+                            download_found += 1
+                            print(f"Saved: "f"{os.path.basename(renamed_file)}")
+
+                        found = True
+
                         break
-                
-                print(f"{'✓' if found else '✗'} Data ditemukan: {found}")
-                
+
+                    except (StaleElementReferenceException) as e:
+
+                        print(f"Row {i} berubah: {e}")
+
+                        continue
+
+                    except Exception as e:
+
+                        print(f"Error processing row "f"{i}: {e}")
+
+                        continue
+
+
+                # JIKA SUDAH DITEMUKAN
+                if found:
+                    print("\nTanggal target berhasil ""ditemukan.")
+
+                    
+
+            # HASIL AKHIR
+            print(" DOWNLOAD SUMMARY ")
+
+            print(f"Target tanggal : {target_date}")
+
+            print(
+                f"Total files downloaded: "
+                f"{download_found}"
+            )
+
+            print(
+                f"Files saved in: "
+                f"{download_path}"
+            )
+
+            if not found:
+                print(
+                    f"\nData dengan tanggal "
+                    f"{target_date} tidak ditemukan."
+                )
+
         except Exception as e:
-            print(f"Error: {e}")
+            print(f"Error during execution: {e}")
+
         finally:
-            time.sleep(3)
+            time.sleep(2)
             driver.quit()
             print("Selesai!")
+
 
 class ExportTeoretisWindow(QtWidgets.QMainWindow):
     def __init__(self):
