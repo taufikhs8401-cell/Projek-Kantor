@@ -32,6 +32,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.form_edit = None
         self.form_downloader_teoretis = None
         self.form_export_2 = None
+        self.form_insert_ETF = None
        
         #untuk menghubungan menu dengan fungsi
         self.actionEXPORT.triggered.connect(self.buka_data_export)
@@ -39,8 +40,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
         self.actionEdit.triggered.connect(self.buka_data_edit)
         self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
-        self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)      
-
+        self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
+        self.actionInsert_2.triggered.connect(self.buka_insert_ETF)    
 
     def buka_data_export(self):
         if self.form_export is None:
@@ -84,6 +85,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.form_export_teoretis.show()
         self.hide()
 
+    def buka_insert_ETF(self):
+        if self.form_insert_ETF is None:
+            self.form_insert_ETF = InsertETFWindow()
+
+        self.form_insert_ETF.show()
+        self.hide()
+
 
 class ExportWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -108,12 +116,14 @@ class ExportWindow(QtWidgets.QMainWindow):
         self.form_batch_insert = None
         self.form_edit = None
         self.form_export_teoretis = None
+        self.form_insert_ETF = None
         
         self.actionDownloader.triggered.connect(self.buka_data_downloader)
         self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
         self.actionEdit.triggered.connect(self.buka_data_edit)
         self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
         self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
+        self.actionInsert_2.triggered.connect(self.buka_insert_ETF)
         
 
     def buka_data_downloader(self):
@@ -140,6 +150,11 @@ class ExportWindow(QtWidgets.QMainWindow):
         self.form_export_teoretis = ExportTeoretisWindow()
         self.form_export_teoretis.setWindowTitle("Export Teoretis")
         self.form_export_teoretis.show()
+
+    def buka_insert_ETF(self):
+        self.form_insert_ETF = InsertETFWindow
+        self.form_insert_ETF.setWindowTitle("Insert ETF")
+        self.form_insert_ETF.show()
 
     def rapikan_teks(self, text):
         # Gabungkan semua baris menjadi satu
@@ -271,12 +286,14 @@ class DownloaderWindow(QtWidgets.QMainWindow):
         self.form_batch_insert = None
         self.form_edit = None
         self.form_export_teoretis = None
+        self.form_insert_ETF = None
         
         self.actionEXPORT.triggered.connect(self.buka_data_export)
         self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
         self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
         self.actionEdit.triggered.connect(self.buka_data_edit)
         self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
+        self.actionInsert_2.triggered.connect(self.buka_insert_ETF)
        
     def buka_data_export(self):
         self.form_export = ExportWindow()
@@ -302,6 +319,11 @@ class DownloaderWindow(QtWidgets.QMainWindow):
         self.form_export_teoretis = ExportTeoretisWindow()
         self.form_export_teoretis.setWindowTitle("Export Teoretis")
         self.form_export_teoretis.show()
+
+    def buka_insert_ETF(self):
+        self.form_insert_ETF = InsertETFWindow()
+        self.form_insert_ETF.setWindowTitle("Insert ETF")
+        self.form_insert_ETF.show()
 
 
     def setup_chrome_options(self, download_path):
@@ -540,12 +562,14 @@ class BatchInsertWindow(QtWidgets.QMainWindow):
         self.form_downloader = None
         self.form_edit = None
         self.form_export_teoretis = None
+        self.form_insert_ETF = None
         
         self.actionEXPORT.triggered.connect(self.buka_data_export)
         self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
         self.actionDownloader.triggered.connect(self.buka_data_downloader)
         self.actionEdit.triggered.connect(self.buka_data_edit)
         self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
+        self.actionInsert_2.triggered.connect(self.buka_insert_ETF)
 
     def buka_data_export(self):
         self.form_export 
@@ -574,6 +598,11 @@ class BatchInsertWindow(QtWidgets.QMainWindow):
         self.form_export_teoretis.setWindowTitle("Export Teoretis")
         self.form_export_teoretis.show()
 
+    def buka_insert_ETF(self):
+        self.form_insert_ETF = InsertETFWindow()
+        self.form_insert_ETF.setWindowTitle("Insert ETF")
+        self.form_insert_ETF.show()
+
 
     def browse_folder(self):
         folder = QFileDialog.getExistingDirectory(
@@ -596,12 +625,14 @@ class EditWindow(QtWidgets.QMainWindow):
         self.form_downloader = None
         self.form_batch_insert = None
         self.form_export_teoretis = None
+        self.form_insert_ETF = None
         
         self.actionEXPORT.triggered.connect(self.buka_data_export)
         self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
         self.actionDownloader.triggered.connect(self.buka_data_downloader)
         self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
         self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
+        self.actionInsert_2.triggered.connect(self.buka_insert_ETF)
     
     def buka_data_export(self):
         self.form_export 
@@ -630,6 +661,11 @@ class EditWindow(QtWidgets.QMainWindow):
         self.form_export_teoretis.setWindowTitle("Export Teoretis")
         self.form_export_teoretis.show()
 
+    def buka_insert_ETF(self):
+        self.form_insert_ETF = InsertETFWindow()
+        self.form_insert_ETF.setWindowTitle("Insert ETF")
+        self.form_insert_ETF.show()
+
 
 class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -645,12 +681,14 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
         self.form_downloader = None
         self.form_edit = None
         self.form_export_teoretis = None
+        self.form_insert_ETF = None
         
         self.actionEXPORT.triggered.connect(self.buka_data_export)
         self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
         self.actionDownloader.triggered.connect(self.buka_data_downloader)
         self.actionEdit.triggered.connect(self.buka_data_edit)
         self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
+        self.actionInsert_2.triggered.connect(self.buka_insert_ETF)
         
     def buka_data_export(self):
         self.form_export 
@@ -679,13 +717,16 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
         self.form_export_teoretis.setWindowTitle("Export Teoretis")
         self.form_export_teoretis.show()
 
+    def buka_insert_ETF(self):
+        self.form_insert_ETF = InsertETFWindow()
+        self.form_insert_ETF.setWindowTitle("Insert ETF")
+        self.form_insert_ETF.show()
+
     def wait_for_download_complete(self, folder, timeout=30):
         """
         Menunggu sampai proses download PDF selesai.
         """
-
         start_time = time.time()
-
         while time.time() - start_time < timeout:
 
             # Cek apakah masih ada file .crdownload
@@ -705,7 +746,6 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
             if not downloading_files and pdf_files:
                 print("Download selesai.")
                 return True
-
             time.sleep(1)
 
         print("Timeout: Download tidak selesai dalam waktu yang ditentukan.")
@@ -714,7 +754,6 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
     def setup_chrome_options(self, download_path):
         """Setup Chrome options for automatic downloading"""
         chrome_options = Options()
-
         prefs = {
             "download.default_directory": download_path,
             "download.prompt_for_download": False,
@@ -730,8 +769,7 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--start-maximized")
         # Add user agent to avoid detection
-        chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-                
+        chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")      
         return chrome_options
     
     def rename_latest_pdf(folder, kode_saham):
@@ -773,14 +811,10 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
 
         print(f"Saved: {os.path.basename(new_path)}")
         
-    
-    
     def btn_run_2_clicked(self):
         # KONFIGURASI
         keywords = ["Harga Teoretis"]
-
         download_path = os.path.abspath("D:/Teoretis/download_teoretis")
-
         os.makedirs(download_path, exist_ok=True)
 
         # AMBIL TANGGAL DARI UI
@@ -804,26 +838,23 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
         }
 
         for en, idn in bulan_lengkap.items():
-
             target_date = target_date.replace(en, idn)
         print(f"Target date: {target_date}")
        
         # SETUP CHROME
         chrome_options = self.setup_chrome_options(download_path)
-
         driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
         wait = WebDriverWait(driver, 30)
 
         # VARIABLE
         download_found = 0
         found = False
-
         try:
             # BUKA WEBSITE IDX
             url = ("https://www.idx.co.id/id/perusahaan-tercatat/keterbukaan-informasi/")
             driver.get(url)
             print("Membuka halaman IDX...")
-            time.sleep(5)
+            time.sleep(30)
 
             # INPUT KEYWORD
             for keyword in keywords:
@@ -845,10 +876,8 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
                     # TEKAN ENTER
                     keyword_input.send_keys("\n")
                     time.sleep(3)
-
                 except Exception as e:
                     print(f"Input keyword tidak ditemukan: "f"{e}")
-
             
             # KLIK TERAPKAN
             terapkan_selectors = [
@@ -866,10 +895,9 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
             ]
 
             terapkan_clicked = False
-
             for selector in terapkan_selectors:
                 try:
-                    button = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, selector)))
+                    button = WebDriverWait(driver, 3).until(EC.element_to_be_clickable((By.XPATH, selector)))
                     driver.execute_script("arguments[0].click();", button)
 
                     print("Tombol Terapkan berhasil diklik.")
@@ -883,13 +911,9 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
             if not terapkan_clicked:
                 print("Tombol Terapkan tidak ditemukan.")
 
-            
-
                 # AMBIL SEMUA ELEMEN TIME
                 time_elements = driver.find_elements(By.XPATH,"//time")
-
                 print(f"Total elemen tanggal ditemukan: "f"{len(time_elements)}")
-
                 if not time_elements:
                     print("Tidak ada elemen tanggal ""di halaman ini.")
 
@@ -898,7 +922,6 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
                     try:
                         # AMBIL TANGGAL
                         row_date = (time_element.text.strip())
-
                         print(f"Row {i}: Date = "f"{row_date}")
 
                         # =========================================
@@ -923,12 +946,9 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
                         if not match_date:
                             print("Format tanggal tidak ""dikenali.")
                             continue
-
                         row_date_only = (match_date.group(1).strip())
-
                         print(f"Row {i}: Date Only = "f"{row_date_only}")
 
-                        
                         # BANDINGKAN TANGGAL
                         if (row_date_only.lower()!= target_date.lower()):
 
@@ -937,9 +957,7 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
 
                         # TANGGAL DITEMUKAN
                         print(f"\n*** TANGGAL DITEMUKAN ***")
-
                         print(f"Target : {target_date}")
-
                         print(f"Found  : {row_date_only}")
 
                         # CARI CONTAINER DATA
@@ -955,13 +973,11 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
                             )
 
                         except NoSuchElementException:
-
                             print("Container data tidak ""ditemukan.")
                             continue
 
                         # AMBIL TEKS ROW
                         row_text = row.text.strip()
-
                         print(f"Data row:\n{row_text}")
 
                         # AMBIL KODE SAHAM
@@ -969,7 +985,6 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
                         # (MLPT)
 
                         kode_saham = None
-
                         match = re.search(
                             r'\(([A-Z]{4})\)',
                             row_text
@@ -1005,13 +1020,10 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
                         except NoSuchElementException:
                             print("Link PDF tidak ditemukan.")
                             continue
-
                         print("Link PDF ditemukan.")
 
-                        
                         # NAMA FILE
                         filename = (f"Harga Teoretis_"f"{kode_saham}.pdf")
-
                         print(f"Downloading: {filename}")
 
                         # SIMPAN FILE SEBELUM DOWNLOAD
@@ -1105,12 +1117,15 @@ class ExportTeoretisWindow(QtWidgets.QMainWindow):
         self.form_batch_insert = None
         self.form_edit = None
         self.form_downloader_teoretis = None
+        self.form_insert_ETF = None
         
         self.actionEXPORT.triggered.connect(self.buka_data_export)
         self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
         self.actionEdit.triggered.connect(self.buka_data_edit)
         self.actionDownloader.triggered.connect(self.buka_data_downloader)
         self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
+        self.actionInsert_2.triggered.connect(self.buka_insert_ETF)
+        
     
     def buka_data_export(self):
         self.form_export 
@@ -1139,7 +1154,107 @@ class ExportTeoretisWindow(QtWidgets.QMainWindow):
         self.form_downloader_teoretis.setWindowTitle("Downloader Teoretis")
         self.form_downloader_teoretis.show()
 
+    def buka_insert_ETF(self):
+        self.form_insert_ETF = InsertETFWindow()
+        self.form_insert_ETF.setWindowTitle("Insert ETF")
+        self.form_insert_ETF.show()  
+
+class InsertETFWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super(InsertETFWindow, self).__init__()
+        uic.loadUi("D:/CODING/suspend/insert_ETF.ui", self)
+        self.setWindowTitle("Insert ETF")
+        self.btn_add.clicked.connect(self.btn_add_clicked)
+
+        self.form_export = None
+        self.form_downloader = None
+        self.form_batch_insert = None
+        self.form_edit = None
+        self.form_downloader_teoretis = None
+        self.form_export_teoretis = None
+        
+        self.actionEXPORT.triggered.connect(self.buka_data_export)
+        self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
+        self.actionEdit.triggered.connect(self.buka_data_edit)
+        self.actionDownloader.triggered.connect(self.buka_data_downloader)
+        self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
+        self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
     
+    def buka_data_export(self):
+        self.form_export 
+        self.form_export = ExportWindow()
+        self.form_export.setWindowTitle("Export Data")
+        self.form_export.show()
+        
+    def buka_data_batch_insert(self):
+        self.form_batch_insert = BatchInsertWindow()
+        self.form_batch_insert.setWindowTitle("Batch Insert")
+        self.form_batch_insert.show()
+
+    def buka_data_edit(self):
+        self.form_edit = EditWindow()
+        self.form_edit.setWindowTitle("Edit Data")
+        self.form_edit.show()
+
+    def buka_data_downloader(self):
+        self.form_downloader 
+        self.form_downloader = DownloaderWindow()
+        self.form_downloader.setWindowTitle("UMA Downloader")
+        self.form_downloader.show()
+
+    def buka_data_downloader_teoretis(self):
+        self.form_downloader_teoretis = DownloaderTeoretisWindow()
+        self.form_downloader_teoretis.setWindowTitle("Downloader Teoretis")
+        self.form_downloader_teoretis.show()
+
+    def buka_data_export_teoretis(self):
+        self.form_export_teoretis = ExportTeoretisWindow()
+        self.form_export_teoretis.setWindowTitle("Export Teoretis")
+        self.form_export_teoretis.show()
+
+    def btn_add(self):
+        isi_nama_kik = self.nama_kik.text()
+        isi_underlying_aset = self.underlying_aset.text()
+        isi_kode_kik = self.kode_kik.text()
+        isi_jumlah_unit_yang_dicatat = self.jml_unit.text()    
+        isi_jumlah_maksimum_unit_penyertaan = self.jml_maksimum.text()
+        isi_harga_perdana = self.harga_perdana.text()
+        isi_nilai_awal = self.nilai_awal.text()
+        isi_manahemen_investasi = self.manajemen_investasi.text()
+        isi_bank_kustodian = self.bank_kustodian.text()
+        isi_dealer_participant = self.dealer.text()
+        isi_tanggal_mulai = self.tanggal_mulai.text()
+
+        print (isi_nama_kik)
+        print (isi_underlying_aset)
+        print (isi_kode_kik)
+        print (isi_jumlah_unit_yang_dicatat)
+        print (isi_jumlah_maksimum_unit_penyertaan)
+        print (isi_harga_perdana)
+        print (isi_nilai_awal)
+        print (isi_manahemen_investasi)
+        print (isi_bank_kustodian)
+        print (isi_dealer_participant)
+        print (isi_tanggal_mulai)
+
+        if (
+            not isi_nama_kik.strip()
+            or not isi_underlying_aset.strip()
+            or not isi_kode_kik.strip()
+            or not isi_jumlah_unit_yang_dicatat.strip()
+            or not isi_jumlah_maksimum_unit_penyertaan.strip()
+            or not isi_harga_perdana.strip()
+            or not isi_nilai_awal.strip()
+            or not isi_manahemen_investasi.strip()
+            or not isi_bank_kustodian.strip()
+            or not isi_dealer_participant.strip()
+            or not isi_tanggal_mulai.strip()
+        ):
+            QMessageBox.warning(self, "Peringatan", "data harus di isi dengan lengkap.")
+            return
+        
+        self.show()
+        
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
 
