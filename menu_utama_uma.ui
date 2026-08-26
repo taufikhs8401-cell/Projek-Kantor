@@ -142,7 +142,7 @@ font-weight:bold;</string>
     <widget class="QLabel" name="label_3">
      <property name="geometry">
       <rect>
-       <x>70</x>
+       <x>80</x>
        <y>210</y>
        <width>191</width>
        <height>51</height>
@@ -160,17 +160,17 @@ font-weight:bold;</string>
     <widget class="QLabel" name="label_4">
      <property name="geometry">
       <rect>
-       <x>40</x>
-       <y>60</y>
-       <width>251</width>
-       <height>151</height>
+       <x>60</x>
+       <y>40</y>
+       <width>231</width>
+       <height>171</height>
       </rect>
      </property>
      <property name="text">
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap>C:/Users/iqp.h24/Downloads/cropped-logo-real-time.webp</pixmap>
+      <pixmap>C:/Users/iqp.h24/Documents/logo IQPlus.png</pixmap>
      </property>
      <property name="scaledContents">
       <bool>true</bool>
@@ -204,8 +204,17 @@ font-weight:bold;</string>
     <addaction name="actionDownloader_Teoretis"/>
     <addaction name="actionEXPORT_Teoretis"/>
    </widget>
+   <widget class="QMenu" name="menuETF">
+    <property name="title">
+     <string>ETF</string>
+    </property>
+    <addaction name="actionInsert_2"/>
+    <addaction name="actionEdit_2"/>
+    <addaction name="actionBatch_Insert_2"/>
+   </widget>
    <addaction name="menuUMA"/>
    <addaction name="menuTeoretis"/>
+   <addaction name="menuETF"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionUMA">
@@ -256,6 +265,21 @@ font-weight:bold;</string>
   <action name="actionEXPORT_Teoretis">
    <property name="text">
     <string>EXPORT</string>
+   </property>
+  </action>
+  <action name="actionInsert_2">
+   <property name="text">
+    <string>Insert</string>
+   </property>
+  </action>
+  <action name="actionEdit_2">
+   <property name="text">
+    <string>Edit</string>
+   </property>
+  </action>
+  <action name="actionBatch_Insert_2">
+   <property name="text">
+    <string>Batch Insert</string>
    </property>
   </action>
  </widget>
