@@ -128,8 +128,17 @@
     <addaction name="actionDownloader_Teoretis"/>
     <addaction name="actionEXPORT_Teoretis"/>
    </widget>
+   <widget class="QMenu" name="menuETF">
+    <property name="title">
+     <string>ETF</string>
+    </property>
+    <addaction name="actionInsert_2"/>
+    <addaction name="actionEdit_2"/>
+    <addaction name="actionBatch_Insert_2"/>
+   </widget>
    <addaction name="menuUMA"/>
    <addaction name="menuTeoretis"/>
+   <addaction name="menuETF"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionUMA">
@@ -180,6 +189,21 @@
   <action name="actionEXPORT_Teoretis">
    <property name="text">
     <string>EXPORT</string>
+   </property>
+  </action>
+  <action name="actionInsert_2">
+   <property name="text">
+    <string>Insert</string>
+   </property>
+  </action>
+  <action name="actionEdit_2">
+   <property name="text">
+    <string>Edit</string>
+   </property>
+  </action>
+  <action name="actionBatch_Insert_2">
+   <property name="text">
+    <string>Batch Insert</string>
    </property>
   </action>
  </widget>

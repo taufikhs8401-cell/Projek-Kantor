@@ -7,20 +7,30 @@
     <x>0</x>
     <y>0</y>
     <width>637</width>
-    <height>173</height>
+    <height>281</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="btn_export">
+   <widget class="QLineEdit" name="lineEdit">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>30</y>
-      <width>161</width>
-      <height>61</height>
+      <x>140</x>
+      <y>20</y>
+      <width>421</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>20</y>
+      <width>71</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="font">
@@ -29,7 +39,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Export TXT</string>
+     <string>Code</string>
     </property>
    </widget>
   </widget>

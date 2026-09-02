@@ -9,6 +9,7 @@ import pdfplumber
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from PyQt5.QtCore import QDate
 from PyQt5.QtWidgets import QApplication, QFileDialog, QMainWindow, QMessageBox
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
@@ -18,8 +19,13 @@ from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import (TimeoutException, NoSuchElementException, StaleElementReferenceException)
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, "IQPlus_downloader.db")
+UI_PATH = os.path.join(BASE_DIR, "batch_insert_etf.ui")
 
 
+
+#menu utama
 class Ui_MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
@@ -32,7 +38,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.form_edit = None
         self.form_downloader_teoretis = None
         self.form_export_2 = None
-        self.form_insert_ETF = None
+        self.form_insert_etf = None
+        self.form_edit_etf = None
+        self.form_batch_etf = None
        
         #untuk menghubungan menu dengan fungsi
         self.actionEXPORT.triggered.connect(self.buka_data_export)
@@ -41,7 +49,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.actionEdit.triggered.connect(self.buka_data_edit)
         self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
         self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
-        self.actionInsert_2.triggered.connect(self.buka_insert_ETF)    
+        self.actionInsert_2.triggered.connect(self.buka_insert_etf)
+        self.actionEdit_2.triggered.connect(self.buka_edit_etf)
+        self.actionBatch_Insert_2.triggered.connect(self.buka_batch_etf)
 
     def buka_data_export(self):
         if self.form_export is None:
@@ -85,14 +95,28 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.form_export_teoretis.show()
         self.hide()
 
-    def buka_insert_ETF(self):
-        if self.form_insert_ETF is None:
-            self.form_insert_ETF = InsertETFWindow()
+    def buka_insert_etf(self):
+        if self.form_insert_etf is None:
+            self.form_insert_etf = InsertETFWindow()
 
-        self.form_insert_ETF.show()
+        self.form_insert_etf.show()
         self.hide()
 
+    def buka_edit_etf(self):
+        if self.form_edit_etf is None:
+            self.form_edit_etf = EditETFWindow()
 
+        self.form_edit_etf.show()
+        self.hide()
+
+    def buka_batch_etf(self):
+        if self.form_batch_etf is None:
+            self.form_batch_etf = BatchETFWindow()
+
+        self.form_batch_etf.show()
+        self.hide()
+
+#menu UMA
 class ExportWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(ExportWindow, self).__init__()
@@ -111,19 +135,25 @@ class ExportWindow(QtWidgets.QMainWindow):
         if hasattr(self, 'lbl_target'):
             self.lbl_target.setText(self.output_folder)
         
+        
         self.form_downloader = None
-        self.form_downloader_teoretis = None
         self.form_batch_insert = None
         self.form_edit = None
-        self.form_export_teoretis = None
-        self.form_insert_ETF = None
+        self.form_downloader_teoretis = None
+        self.form_export_2 = None
+        self.form_insert_etf = None
+        self.form_edit_etf = None
+        self.form_batch_etf = None
         
+        #untuk menghubungan menu dengan fungsi
         self.actionDownloader.triggered.connect(self.buka_data_downloader)
         self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
         self.actionEdit.triggered.connect(self.buka_data_edit)
         self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
         self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
-        self.actionInsert_2.triggered.connect(self.buka_insert_ETF)
+        self.actionInsert_2.triggered.connect(self.buka_insert_etf)
+        self.actionEdit_2.triggered.connect(self.buka_edit_etf)
+        self.actionBatch_Insert_2.triggered.connect(self.buka_batch_etf)
         
 
     def buka_data_downloader(self):
@@ -151,10 +181,20 @@ class ExportWindow(QtWidgets.QMainWindow):
         self.form_export_teoretis.setWindowTitle("Export Teoretis")
         self.form_export_teoretis.show()
 
-    def buka_insert_ETF(self):
-        self.form_insert_ETF = InsertETFWindow
+    def buka_insert_etf(self):
+        self.form_insert_ETF = InsertETFWindow()
         self.form_insert_ETF.setWindowTitle("Insert ETF")
         self.form_insert_ETF.show()
+
+    def buka_edit_etf(self):
+        self.form_edit_etf = EditETFWindow()
+        self.form_edit_etf.setWindowTitle("Edit ETF")
+        self.form_edit_etf.show()
+
+    def buka_batch_etf(self):
+        self.form_batch_etf = BatchETFWindow()
+        self.form_batch_etf.setWindowTitle("Batch Insert ETF")
+        self.form_batch_etf.show()
 
     def rapikan_teks(self, text):
         # Gabungkan semua baris menjadi satu
@@ -282,18 +322,23 @@ class DownloaderWindow(QtWidgets.QMainWindow):
         self.btn_run.clicked.connect(self.btn_run_clicked)
        
         self.form_export = None
-        self.form_downloader_teoretis = None
         self.form_batch_insert = None
         self.form_edit = None
-        self.form_export_teoretis = None
-        self.form_insert_ETF = None
+        self.form_downloader_teoretis = None
+        self.form_export_2 = None
+        self.form_insert_etf = None
+        self.form_edit_etf = None
+        self.form_batch_etf = None
         
+        #untuk menghubungan menu dengan fungsi
         self.actionEXPORT.triggered.connect(self.buka_data_export)
-        self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
         self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
         self.actionEdit.triggered.connect(self.buka_data_edit)
+        self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
         self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
-        self.actionInsert_2.triggered.connect(self.buka_insert_ETF)
+        self.actionInsert_2.triggered.connect(self.buka_insert_etf)
+        self.actionEdit_2.triggered.connect(self.buka_edit_etf)
+        self.actionBatch_Insert_2.triggered.connect(self.buka_batch_etf)
        
     def buka_data_export(self):
         self.form_export = ExportWindow()
@@ -320,10 +365,20 @@ class DownloaderWindow(QtWidgets.QMainWindow):
         self.form_export_teoretis.setWindowTitle("Export Teoretis")
         self.form_export_teoretis.show()
 
-    def buka_insert_ETF(self):
-        self.form_insert_ETF = InsertETFWindow()
-        self.form_insert_ETF.setWindowTitle("Insert ETF")
-        self.form_insert_ETF.show()
+    def buka_insert_etf(self):
+        self.form_insert_etf = InsertETFWindow()
+        self.form_insert_etf.setWindowTitle("Insert ETF")
+        self.form_insert_etf.show()
+
+    def buka_edit_etf(self):
+        self.form_edit_etf = EditETFWindow()
+        self.form_edit_etf.setWindowTitle("Edit ETF")
+        self.form_edit_etf.show()
+
+    def buka_batch_etf(self):
+        self.form_batch_etf = BatchETFWindow()
+        self.form_batch_etf.setWindowTitle("Batch Insert ETF")
+        self.form_batch_etf.show()
 
 
     def setup_chrome_options(self, download_path):
@@ -558,18 +613,25 @@ class BatchInsertWindow(QtWidgets.QMainWindow):
         self.btn_import.clicked.connect(self.browse_folder)
 
         self.form_export = None
-        self.form_downloader_teoretis = None
         self.form_downloader = None
-        self.form_edit = None
-        self.form_export_teoretis = None
-        self.form_insert_ETF = None
         
+        self.form_edit = None
+        self.form_downloader_teoretis = None
+        self.form_export_2 = None
+        self.form_insert_etf = None
+        self.form_edit_etf = None
+        self.form_batch_etf = None
+        
+        #untuk menghubungan menu dengan fungsi
         self.actionEXPORT.triggered.connect(self.buka_data_export)
-        self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
         self.actionDownloader.triggered.connect(self.buka_data_downloader)
+        
         self.actionEdit.triggered.connect(self.buka_data_edit)
+        self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
         self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
-        self.actionInsert_2.triggered.connect(self.buka_insert_ETF)
+        self.actionInsert_2.triggered.connect(self.buka_insert_etf)
+        self.actionEdit_2.triggered.connect(self.buka_edit_etf)
+        self.actionBatch_Insert_2.triggered.connect(self.buka_batch_etf)
 
     def buka_data_export(self):
         self.form_export 
@@ -598,10 +660,20 @@ class BatchInsertWindow(QtWidgets.QMainWindow):
         self.form_export_teoretis.setWindowTitle("Export Teoretis")
         self.form_export_teoretis.show()
 
-    def buka_insert_ETF(self):
-        self.form_insert_ETF = InsertETFWindow()
-        self.form_insert_ETF.setWindowTitle("Insert ETF")
-        self.form_insert_ETF.show()
+    def buka_insert_etf(self):
+        self.form_insert_etf = InsertETFWindow()
+        self.form_insert_etf.setWindowTitle("Insert ETF")
+        self.form_insert_etf.show()
+
+    def buka_edit_etf(self):
+        self.form_edit_etf = EditETFWindow()
+        self.form_edit_etf.setWindowTitle("Edit ETF")
+        self.form_edit_etf.show()
+
+    def buka_batch_etf(self):
+        self.form_batch_etf = BatchETFWindow()
+        self.form_batch_etf.setWindowTitle("Batch Insert ETF")
+        self.form_batch_etf.show()
 
 
     def browse_folder(self):
@@ -617,22 +689,27 @@ class BatchInsertWindow(QtWidgets.QMainWindow):
 class EditWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super() .__init__()
-        uic.loadUi("D:/CODING/suspend/menu_edit.ui", self)
+        uic.loadUi("D:/CODING/suspend/edit.ui", self)
         self.setWindowTitle("Edit Data")
 
         self.form_export = None
-        self.form_downloader_teoretis = None
         self.form_downloader = None
         self.form_batch_insert = None
-        self.form_export_teoretis = None
-        self.form_insert_ETF = None
+        self.form_downloader_teoretis = None
+        self.form_export_2 = None
+        self.form_insert_etf = None
+        self.form_edit_etf = None
+        self.form_batch_etf = None
         
+        #untuk menghubungan menu dengan fungsi
         self.actionEXPORT.triggered.connect(self.buka_data_export)
-        self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
         self.actionDownloader.triggered.connect(self.buka_data_downloader)
         self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
+        self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
         self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
-        self.actionInsert_2.triggered.connect(self.buka_insert_ETF)
+        self.actionInsert_2.triggered.connect(self.buka_insert_etf)
+        self.actionEdit_2.triggered.connect(self.buka_edit_etf)
+        self.actionBatch_Insert_2.triggered.connect(self.buka_batch_etf)
     
     def buka_data_export(self):
         self.form_export 
@@ -661,12 +738,12 @@ class EditWindow(QtWidgets.QMainWindow):
         self.form_export_teoretis.setWindowTitle("Export Teoretis")
         self.form_export_teoretis.show()
 
-    def buka_insert_ETF(self):
-        self.form_insert_ETF = InsertETFWindow()
-        self.form_insert_ETF.setWindowTitle("Insert ETF")
-        self.form_insert_ETF.show()
+    def buka_insert_etf(self):
+        self.form_insert_etf = InsertETFWindow()
+        self.form_insert_etf.setWindowTitle("Insert ETF")
+        self.form_insert_etf.show()
 
-
+#menu teoretis
 class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(DownloaderTeoretisWindow, self).__init__()
@@ -677,18 +754,25 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
         self.btn_run_2.clicked.connect(self.btn_run_2_clicked)
 
         self.form_export = None
-        self.form_batch_insert = None
         self.form_downloader = None
+        self.form_batch_insert = None
         self.form_edit = None
-        self.form_export_teoretis = None
-        self.form_insert_ETF = None
         
+        self.form_export_2 = None
+        self.form_insert_etf = None
+        self.form_edit_etf = None
+        self.form_batch_etf = None
+        
+        #untuk menghubungan menu dengan fungsi
         self.actionEXPORT.triggered.connect(self.buka_data_export)
-        self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
         self.actionDownloader.triggered.connect(self.buka_data_downloader)
+        self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
         self.actionEdit.triggered.connect(self.buka_data_edit)
+        
         self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
-        self.actionInsert_2.triggered.connect(self.buka_insert_ETF)
+        self.actionInsert_2.triggered.connect(self.buka_insert_etf)
+        self.actionEdit_2.triggered.connect(self.buka_edit_etf)
+        self.actionBatch_Insert_2.triggered.connect(self.buka_batch_etf)
         
     def buka_data_export(self):
         self.form_export 
@@ -717,10 +801,20 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
         self.form_export_teoretis.setWindowTitle("Export Teoretis")
         self.form_export_teoretis.show()
 
-    def buka_insert_ETF(self):
-        self.form_insert_ETF = InsertETFWindow()
-        self.form_insert_ETF.setWindowTitle("Insert ETF")
-        self.form_insert_ETF.show()
+    def buka_insert_etf(self):
+        self.form_insert_etf = InsertETFWindow()
+        self.form_insert_etf.setWindowTitle("Insert ETF")
+        self.form_insert_etf.show()
+
+    def buka_edit_etf(self):
+        self.form_edit_etf = EditETFWindow()
+        self.form_edit_etf.setWindowTitle("Edit ETF")
+        self.form_edit_etf.show()
+
+    def buka_batch_etf(self):
+        self.form_batch_etf = BatchETFWindow()
+        self.form_batch_etf.setWindowTitle("Batch Insert ETF")
+        self.form_batch_etf.show()
 
     def wait_for_download_complete(self, folder, timeout=30):
         """
@@ -1109,7 +1203,7 @@ class DownloaderTeoretisWindow(QtWidgets.QMainWindow):
 class ExportTeoretisWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(ExportTeoretisWindow, self).__init__()
-        uic.loadUi("D:/CODING/suspend/export_teoretis.ui", self)
+        uic.loadUi("D:/CODING/suspend/export_2.ui", self)
         self.setWindowTitle("Export Teoretis")
 
         self.form_export = None
@@ -1117,14 +1211,19 @@ class ExportTeoretisWindow(QtWidgets.QMainWindow):
         self.form_batch_insert = None
         self.form_edit = None
         self.form_downloader_teoretis = None
-        self.form_insert_ETF = None
+        self.form_insert_etf = None
+        self.form_edit_etf = None
+        self.form_batch_etf = None
         
+        #untuk menghubungan menu dengan fungsi
         self.actionEXPORT.triggered.connect(self.buka_data_export)
+        self.actionDownloader.triggered.connect(self.buka_data_downloader)
         self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
         self.actionEdit.triggered.connect(self.buka_data_edit)
-        self.actionDownloader.triggered.connect(self.buka_data_downloader)
         self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
-        self.actionInsert_2.triggered.connect(self.buka_insert_ETF)
+        self.actionInsert_2.triggered.connect(self.buka_insert_etf)
+        self.actionEdit_2.triggered.connect(self.buka_edit_etf)
+        self.actionBatch_Insert_2.triggered.connect(self.buka_batch_etf)
         
     
     def buka_data_export(self):
@@ -1154,31 +1253,51 @@ class ExportTeoretisWindow(QtWidgets.QMainWindow):
         self.form_downloader_teoretis.setWindowTitle("Downloader Teoretis")
         self.form_downloader_teoretis.show()
 
-    def buka_insert_ETF(self):
-        self.form_insert_ETF = InsertETFWindow()
-        self.form_insert_ETF.setWindowTitle("Insert ETF")
-        self.form_insert_ETF.show()  
+    def buka_insert_etf(self):
+        self.form_insert_etf = InsertETFWindow()
+        self.form_insert_etf.setWindowTitle("Insert ETF")
+        self.form_insert_etf.show() 
 
+    def buka_edit_etf(self):
+        self.form_edit_etf = EditETFWindow()
+        self.form_edit_etf.setWindowTitle("Edit ETF")
+        self.form_edit_etf.show() 
+
+    def buka_batch_etf(self):
+        self.form_batch_etf = BatchETFWindow()
+        self.form_batch_etf.setWindowTitle("Batch Insert ETF")
+        self.form_batch_etf.show()
+
+#menu ETF
 class InsertETFWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(InsertETFWindow, self).__init__()
-        uic.loadUi("D:/CODING/suspend/insert_ETF.ui", self)
+        uic.loadUi("D:/CODING/suspend/insert_etf.ui", self)
         self.setWindowTitle("Insert ETF")
-        self.btn_add.clicked.connect(self.btn_add_clicked)
+        #isi_tanggal = QDate.currentDate().toString("yyyy-MM-dd")
+        #self.tanggal_mulai.setText(isi_tanggal)
 
+        self.pushButton.clicked.connect(self.pushButton_clicked)
+        self.btn_clear.clicked.connect(self.btn_clear_clicked)
+        
         self.form_export = None
         self.form_downloader = None
         self.form_batch_insert = None
         self.form_edit = None
         self.form_downloader_teoretis = None
-        self.form_export_teoretis = None
+        self.form_export_2 = None
+        self.form_edit_etf = None
+        self.form_batch_etf = None
         
+        #untuk menghubungan menu dengan fungsi
         self.actionEXPORT.triggered.connect(self.buka_data_export)
+        self.actionDownloader.triggered.connect(self.buka_data_downloader)
         self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
         self.actionEdit.triggered.connect(self.buka_data_edit)
-        self.actionDownloader.triggered.connect(self.buka_data_downloader)
         self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
         self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
+        self.actionEdit_2.triggered.connect(self.buka_edit_etf)
+        self.actionBatch_Insert_2.triggered.connect(self.buka_batch_etf)
     
     def buka_data_export(self):
         self.form_export 
@@ -1212,17 +1331,27 @@ class InsertETFWindow(QtWidgets.QMainWindow):
         self.form_export_teoretis.setWindowTitle("Export Teoretis")
         self.form_export_teoretis.show()
 
-    def btn_add(self):
+    def buka_edit_etf(self):
+        self.form_edit_etf = EditETFWindow()
+        self.form_edit_etf.setWindowTitle("Edit ETF")
+        self.form_edit_etf.show() 
+    
+    def buka_batch_etf(self):
+        self.form_batch_etf = BatchETFWindow()
+        self.form_batch_etf.setWindowTitle("Batch Insert ETF")
+        self.form_batch_etf.show()
+
+    def pushButton_clicked(self):
         isi_nama_kik = self.nama_kik.text()
-        isi_underlying_aset = self.underlying_aset.text()
+        isi_underlying_aset = self.underlying.text()
         isi_kode_kik = self.kode_kik.text()
         isi_jumlah_unit_yang_dicatat = self.jml_unit.text()    
         isi_jumlah_maksimum_unit_penyertaan = self.jml_maksimum.text()
         isi_harga_perdana = self.harga_perdana.text()
         isi_nilai_awal = self.nilai_awal.text()
-        isi_manahemen_investasi = self.manajemen_investasi.text()
+        isi_manajemen_investasi = self.manajemen_investasi.text()
         isi_bank_kustodian = self.bank_kustodian.text()
-        isi_dealer_participant = self.dealer.text()
+        isi_dealer_participan = self.dealer.text()
         isi_tanggal_mulai = self.tanggal_mulai.text()
 
         print (isi_nama_kik)
@@ -1232,29 +1361,1481 @@ class InsertETFWindow(QtWidgets.QMainWindow):
         print (isi_jumlah_maksimum_unit_penyertaan)
         print (isi_harga_perdana)
         print (isi_nilai_awal)
-        print (isi_manahemen_investasi)
+        print (isi_manajemen_investasi)
         print (isi_bank_kustodian)
-        print (isi_dealer_participant)
+        print (isi_dealer_participan)
         print (isi_tanggal_mulai)
 
-        if (
-            not isi_nama_kik.strip()
-            or not isi_underlying_aset.strip()
-            or not isi_kode_kik.strip()
-            or not isi_jumlah_unit_yang_dicatat.strip()
-            or not isi_jumlah_maksimum_unit_penyertaan.strip()
-            or not isi_harga_perdana.strip()
-            or not isi_nilai_awal.strip()
-            or not isi_manahemen_investasi.strip()
-            or not isi_bank_kustodian.strip()
-            or not isi_dealer_participant.strip()
-            or not isi_tanggal_mulai.strip()
-        ):
+        if not isi_nama_kik or not isi_underlying_aset or not isi_kode_kik or not isi_jumlah_unit_yang_dicatat or not isi_jumlah_maksimum_unit_penyertaan or not isi_harga_perdana or not isi_nilai_awal or not isi_manajemen_investasi or not isi_bank_kustodian or not isi_dealer_participan or not isi_tanggal_mulai:
+        
             QMessageBox.warning(self, "Peringatan", "data harus di isi dengan lengkap.")
             return
         
+        pesan = "Apakah data sudah benar?\n\n"
+        result = QMessageBox.question(self, 'Konfirmasi', pesan,
+                                        QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if result == QMessageBox.Yes:
+            print('Yes clicked.')
+        else:
+            print('No clicked.')
         self.show()
+
+        try:
+            koneksi = sqlite3.connect("IQPlus_downloader.db")
+            perintahSQL  = "INSERT INTO "
+            perintahSQL += "    insert_etf(nama_kik, underlying_aset, kode_kik, jumlah_unit_yang_dicatat, jumlah_maksimum_unit_penyertaan, harga_perdana, nilai_awal, manajemen_investasi, bank_kustodian, dealer_participan, tanggal_mulai)"
+            perintahSQL += " VALUES ('"+ isi_nama_kik + "', "
+            perintahSQL += "         '"+ isi_underlying_aset + "', "
+            perintahSQL += "         '"+ isi_kode_kik + "',"
+            perintahSQL += "         '"+ isi_jumlah_unit_yang_dicatat + "',"
+            perintahSQL += "         '"+ isi_jumlah_maksimum_unit_penyertaan + "',"
+            perintahSQL += "         '"+ isi_harga_perdana + "',"
+            perintahSQL += "         '"+ isi_nilai_awal + "',"
+            perintahSQL += "         '"+ isi_manajemen_investasi + "',"
+            perintahSQL += "         '"+ isi_bank_kustodian + "',"
+            perintahSQL += "         '"+ isi_dealer_participan + "',"
+            perintahSQL += "         '"+ isi_tanggal_mulai + "'); "
+            koneksi.execute(perintahSQL)
+            koneksi.commit()
+            QMessageBox.information(self, "Sukses", "Data Berhasil Disimpan")
+            koneksi.close()
+
+        except sqlite3.Error as e:
+            print("Gagal membuat tabel :", e)
+
+        finally:
+            koneksi.close()
+
+    def btn_clear_clicked(self):
+        self.nama_kik.clear()
+        self.underlying.clear()
+        self.kode_kik.clear()
+        self.jml_unit.clear()
+        self.jml_maksimum.clear()
+        self.harga_perdana.clear()
+        self.nilai_awal.clear()
+        self.manajemen_investasi.clear()
+        self.bank_kustodian.clear()
+        self.dealer.clear()
+        self.tanggal_mulai.clear()
+
+class EditETFWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super(EditETFWindow, self).__init__()
+        uic.loadUi("D:/CODING/suspend/edit_etf.ui", self)
+        self.setWindowTitle("Edit ETF")
+        self.btn_clear.clicked.connect(self.btn_clear_clicked)
+
+        #self.check_id.clicked.connect(self.check_id_clicked)
+        #self.save_change.clicked.connect(self.save_change_clicked)
+        #self.clear.clicked.connect(self.clear_form)
+
+        #self.set_form_locked()
+
+        self.form_export = None
+        self.form_downloader = None
+        self.form_batch_insert = None
+        self.form_edit = None
+        self.form_downloader_teoretis = None
+        self.form_export_2 = None
+        self.form_insert_etf = None
         
+        self.form_batch_etf = None
+        
+        #untuk menghubungan menu dengan fungsi
+        self.actionEXPORT.triggered.connect(self.buka_data_export)
+        self.actionDownloader.triggered.connect(self.buka_data_downloader)
+        self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
+        self.actionEdit.triggered.connect(self.buka_data_edit)
+        self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
+        self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
+        self.actionInsert_2.triggered.connect(self.buka_insert_etf)
+        
+        self.actionBatch_Insert_2.triggered.connect(self.buka_batch_etf)
+
+    def buka_data_export(self):
+        self.form_export 
+        self.form_export = ExportWindow()
+        self.form_export.setWindowTitle("Export Data")
+        self.form_export.show()
+        
+    def buka_data_batch_insert(self):
+        self.form_batch_insert = BatchInsertWindow()
+        self.form_batch_insert.setWindowTitle("Batch Insert")
+        self.form_batch_insert.show()
+
+    def buka_data_edit(self):
+        self.form_edit = EditWindow()
+        self.form_edit.setWindowTitle("Edit Data")
+        self.form_edit.show()
+
+    def buka_data_downloader(self):
+        self.form_downloader 
+        self.form_downloader = DownloaderWindow()
+        self.form_downloader.setWindowTitle("UMA Downloader")
+        self.form_downloader.show()
+
+    def buka_data_downloader_teoretis(self):
+        self.form_downloader_teoretis = DownloaderTeoretisWindow()
+        self.form_downloader_teoretis.setWindowTitle("Downloader Teoretis")
+        self.form_downloader_teoretis.show()
+
+    def buka_data_export_teoretis(self):
+        self.form_export_teoretis = ExportTeoretisWindow()
+        self.form_export_teoretis.setWindowTitle("Export Teoretis")
+        self.form_export_teoretis.show()
+
+    def buka_insert_etf(self):
+        self.form_insert_etf = InsertETFWindow()
+        self.form_insert_etf.setWindowTitle("Insert ETF")
+        self.form_insert_etf.show()
+
+    def buka_batch_etf(self):
+        self.form_batch_etf = BatchETFWindow()
+        self.form_batch_etf.setWindowTitle("Batch Insert ETF")
+        self.form_batch_etf.show()
+
+    def set_form_locked(self):
+
+        # ID tetap bisa diketik
+        self.id.setEnabled(True)
+
+        # Kolom lainnya dikunci
+        self.nama_kik.setEnabled(False)
+        self.underlying.setEnabled(False)
+        self.kode_kik.setEnabled(False)
+        self.jml_unit.setEnabled(False)
+        self.jml_maksimum.setEnabled(False)
+        self.harga_perdana.setEnabled(False)
+        self.nilai_awal.setEnabled(False)
+        self.manajemen_investasi.setEnabled(False)
+        self.bank_kustodian.setEnabled(False)
+        self.dealer.setEnabled(False)
+        self.tanggal_mulai.setEnabled(False)
+
+        # Tombol Save juga dikunci
+        self.save_change.setEnabled(False)
+
+    def set_form_unlocked(self):
+        # ID tidak boleh diubah
+        self.id.setEnabled(False)
+
+        # Kolom lainnya bisa diedit
+        self.nama_kik.setEnabled(True)
+        self.underlying.setEnabled(True)
+        self.kode_kik.setEnabled(True)
+        self.jml_unit.setEnabled(True)
+        self.jml_maksimum.setEnabled(True)
+        self.harga_perdana.setEnabled(True)
+        self.nilai_awal.setEnabled(True)
+        self.manajemen_investasi.setEnabled(True)
+        self.bank_kustodian.setEnabled(True)
+        self.dealer.setEnabled(True)
+        self.tanggal_mulai.setEnabled(True)
+
+        # Save aktif
+        self.save_change.setEnabled(True)
+
+    def check_id_clicked(self):
+        # Ambil ID
+        id_cari = self.id.text().strip()
+
+        # CEK ID KOSONG
+        if not id_cari:
+            QMessageBox.warning(self,"Peringatan", "Silakan masukkan ID terlebih dahulu.")
+            return
+
+        self.id.setText(id_cari)
+
+        koneksi = None
+
+        try:
+
+            # ======================================
+            # KONEKSI DATABASE
+            # ======================================
+            koneksi = sqlite3.connect(
+                "IQPlus_downloader.db"
+            )
+
+            cursor = koneksi.cursor()
+
+            cursor.execute("""
+                SELECT
+                    Nama_KIK,
+                    Underlying_aset,
+                    Kode_KIK,
+                    Jumlah_unit_yang_dicatat,
+                    Jumlah_maksimum_unit_penyertaan,
+                    Harga_perdana,
+                    Nilai_awal,
+                    Manajemen_investasi,
+                    Bank_kustodian,
+                    Dealer_participant,
+                    Tanggal_mulai
+                FROM insert_etf
+                WHERE id = ?
+            """, (id_cari,))
+
+            data = cursor.fetchone()
+
+            if data is None:
+
+                QMessageBox.warning(
+                    self,
+                    "Data Tidak Ditemukan",
+                    f"ID {id_cari} tidak ditemukan."
+                )
+
+                self.clear_form()
+
+                return
+
+            # ======================================
+            # DATA DITEMUKAN
+            # ======================================
+            (
+                nama_kik,
+                underlying_aset,
+                kode_kik,
+                jml_unit,
+                jml_maksimum,
+                harga_perdana,
+                nilai_awal,
+                manajemen_investasi,
+                bank_kustodian,
+                dealer_participant,
+                tanggal_mulai
+            ) = data
+
+            
+            # TAMPILKAN DATA KE FORM
+            self.nama_kik.setText(str(nama_kik or ""))
+            self.underlying.setText(str(underlying_aset or ""))
+            self.kode_kik.setText(str(kode_kik or ""))
+            self.jml_unit.setText(str(jml_unit or ""))
+            self.jml_maksimum.setText(str(jml_maksimum or ""))
+            self.harga_perdana.setText(str(harga_perdana or ""))
+            self.nilai_awal.setText(str(nilai_awal or ""))
+            self.manajemen_investasi.setText(str(manajemen_investasi or ""))
+            self.bank_kustodian.setText(str(bank_kustodian or ""))
+            self.dealer.setText(str(dealer_participant or ""))
+
+
+            # TANGGAL
+            if tanggal_mulai:
+                tanggal = QDate.fromString(str(tanggal_mulai), "yyyy-MM-dd")
+
+                if tanggal.isValid():
+                    self.tanggal_mulai.setDate(tanggal)
+
+            # BUKA FORM UNTUK EDIT
+            self.set_form_unlocked()
+
+            QMessageBox.information(
+                self, "Data Ditemukan", f"Data dengan ID {id_cari} berhasil ditemukan.")
+
+            print(f"Data ID {id_cari} berhasil ditemukan.")
+
+        except sqlite3.Error as e:
+
+            QMessageBox.critical(
+                self,
+                "Error Database",
+                f"Gagal mengambil data:\n\n{e}"
+            )
+
+            print(
+                "Error database:",
+                e
+            )
+
+        finally:
+
+            if koneksi is not None:
+                koneksi.close()
+
+
+
+    def btn_clear_clicked(self):
+        self.id.clear()
+        self.nama_kik.clear()
+        self.underlying.clear()
+        self.kode_kik.clear()
+        self.jml_unit.clear()
+        self.jml_maksimum.clear()
+        self.harga_perdana.clear()
+        self.nilai_awal.clear()
+        self.manajemen_investasi.clear()
+        self.bank_kustodian.clear()
+        self.dealer.clear()
+        self.tanggal_mulai.clear()
+
+class BatchETFWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super(BatchETFWindow, self).__init__()
+        uic.loadUi("D:/CODING/suspend/batch_etf.ui", self)
+        self.setWindowTitle("Batch Insert ETF")
+        self.btn_import.clicked.connect(self.browse_folder)
+
+        self.db_path = r"D:/CODING/suspend/IQPlus_downloader.db"
+        #textbox tida bisa di ketik
+        #self.ui.txt_path.setReadOnly(True)
+        #koneksikan tombol import
+        #self.btn_import.clicked.connect(self.btn_import_clicked)
+        #koneksikan tombol prosess file
+        self.pushButton.clicked.connect(self.pushButton_clicked)
+
+        self.form_export = None
+        self.form_downloader = None
+        self.form_batch_insert = None
+        self.form_edit = None
+        self.form_downloader_teoretis = None
+        self.form_export_2 = None
+        self.form_insert_etf = None
+        self.form_edit_etf = None
+        
+        
+        #untuk menghubungan menu dengan fungsi
+        self.actionEXPORT.triggered.connect(self.buka_data_export)
+        self.actionDownloader.triggered.connect(self.buka_data_downloader)
+        self.actionBatch_Insert.triggered.connect(self.buka_data_batch_insert)
+        self.actionEdit.triggered.connect(self.buka_data_edit)
+        self.actionDownloader_Teoretis.triggered.connect(self.buka_data_downloader_teoretis)
+        self.actionEXPORT_Teoretis.triggered.connect(self.buka_data_export_teoretis)
+        self.actionInsert_2.triggered.connect(self.buka_insert_etf)
+        self.actionEdit_2.triggered.connect(self.buka_edit_etf)
+        
+
+    def buka_data_export(self):
+        self.form_export 
+        self.form_export = ExportWindow()
+        self.form_export.setWindowTitle("Export Data")
+        self.form_export.show()
+        
+    def buka_data_batch_insert(self):
+        self.form_batch_insert = BatchInsertWindow()
+        self.form_batch_insert.setWindowTitle("Batch Insert")
+        self.form_batch_insert.show()
+
+    def buka_data_edit(self):
+        self.form_edit = EditWindow()
+        self.form_edit.setWindowTitle("Edit Data")
+        self.form_edit.show()
+
+    def buka_data_downloader(self):
+        self.form_downloader 
+        self.form_downloader = DownloaderWindow()
+        self.form_downloader.setWindowTitle("UMA Downloader")
+        self.form_downloader.show()
+
+    def buka_data_downloader_teoretis(self):
+        self.form_downloader_teoretis = DownloaderTeoretisWindow()
+        self.form_downloader_teoretis.setWindowTitle("Downloader Teoretis")
+        self.form_downloader_teoretis.show()
+
+    def buka_data_export_teoretis(self):
+        self.form_export_teoretis = ExportTeoretisWindow()
+        self.form_export_teoretis.setWindowTitle("Export Teoretis")
+        self.form_export_teoretis.show()
+
+    def buka_insert_etf(self):
+        self.form_insert_etf = InsertETFWindow()
+        self.form_insert_etf.setWindowTitle("Insert ETF")
+        self.form_insert_etf.show()
+
+    def buka_edit_etf(self):
+        self.form_edit_etf = EditETFWindow()
+        self.form_edit_etf.setWindowTitle("Edit ETF")
+        self.form_edit_etf.show()
+
+    def browse_folder(self):
+            folder = QFileDialog.getExistingDirectory(
+                self,
+                "Pilih Folder"
+            )
+    
+            if folder:
+                self.txt_path.setText(folder)
+
+    def pushButton_clicked(self):
+
+        folder_path = self.ui.txt_path.text().strip()
+
+        if not folder_path:
+            QMessageBox.warning(
+                self,
+                "Peringatan",
+                "Silakan pilih folder PDF terlebih dahulu."
+            )
+            return
+
+        print("Mulai proses PDF...")
+
+        # Ambil semua PDF
+        pdf_files = [
+            f for f in os.listdir(folder_path)
+            if f.lower().endswith(".pdf")
+        ]
+
+        if not pdf_files:
+            QMessageBox.warning(
+                self,
+                "Peringatan",
+                "Tidak ada file PDF."
+            )
+            return
+
+        # Proses setiap PDF
+        for filename in pdf_files:
+
+            file_path = os.path.join(
+                folder_path,
+                filename
+            )
+
+            print("Memproses:", filename)
+
+            # Baca PDF
+            text = self.baca_pdf(file_path)
+
+            # Ambil data ETF
+            data = self.extract_data_etf(text)
+
+            print(data)
+
+        QMessageBox.information(
+            self,
+            "Selesai",
+            f"{len(pdf_files)} file PDF selesai diproses."
+        )
+
+    def baca_pdf(self, file_path):
+
+        try:
+
+            text = ""
+
+            with pdfplumber.open(file_path) as pdf:
+
+                for page in pdf.pages:
+
+                    page_text = page.extract_text()
+
+                    if page_text:
+
+                        text += page_text + "\n"
+
+            return text
+
+        except Exception as e:
+
+            print(
+                f"Gagal membaca PDF: {file_path}"
+            )
+
+            print(
+                f"Error: {e}"
+            )
+
+            return ""
+
+    def clean_text(self, text):
+
+        if not text:
+            return ""
+
+        # Hilangkan spasi berlebihan
+        text = re.sub(
+            r"[ \t]+",
+            " ",
+            text
+        )
+
+        # Hilangkan baris kosong
+        text = re.sub(
+            r"\n+",
+            "\n",
+            text
+        )
+        return text.strip()
+
+    def get_value_after_label(
+        self,
+        text,
+        label,
+        stop_labels=None
+    ):
+
+        if stop_labels is None:
+            stop_labels = []
+
+        # Buat regex stop
+        stop_pattern = ""
+        if stop_labels:
+            stop_pattern = (
+                r"(?="
+                + "|".join(
+                    re.escape(x)
+                    for x in stop_labels
+                )
+                + r")"
+            )
+
+        pattern = (
+            re.escape(label)
+            + r"\s*(.*?)"
+            + stop_pattern
+        )
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE |
+            re.DOTALL
+        )
+
+        if match:
+            value = match.group(1)
+            value = self.clean_text(
+                value
+            )
+
+            return value
+        return ""
+
+    def extract_nama_kik(self, text):
+
+        # ----------------------------------------------------
+        # Cara 1
+        # ----------------------------------------------------
+
+        pattern = (
+            r"Nama KIK\s+"
+            r"(.*?)"
+            r"(?=Pencatatan Awal ETF|"
+            r"Underlying Aset|"
+            r"Kode KIK)"
+        )
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE |
+            re.DOTALL
+        )
+
+        if match:
+
+            return self.clean_text(
+                match.group(1)
+            )
+        return ""
+
+    def extract_underlying(self, text):
+
+        pattern = (
+            r"Underlying Aset\s+"
+            r"(.*?)"
+            r"(?=Jumlah Maksimum|"
+            r"Jumlah Unit|"
+            r"Kode KIK|"
+            r"Harga Perdana)"
+        )
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE |
+            re.DOTALL
+        )
+
+        if match:
+
+            return self.clean_text(
+                match.group(1)
+            )
+
+        return ""
+
+    # ========================================================
+    # EKSTRAK KODE KIK
+    # ========================================================
+
+    def extract_kode_kik(self, text):
+
+        pattern = (
+            r"(?:Kode KIK|KIK Code)"
+            r"\s+"
+            r"([A-Z0-9]{2,20})"
+        )
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE
+        )
+
+        if match:
+
+            return match.group(1).strip()
+
+        return ""
+
+    # ========================================================
+    # EKSTRAK JUMLAH UNIT
+    # ========================================================
+
+    def extract_jumlah_unit(self, text):
+
+        # ----------------------------------------------------
+        # Format Indonesia
+        # ----------------------------------------------------
+
+        pattern = (
+            r"Jumlah Unit Yang dicatatkan"
+            r"\s+"
+            r"([\d\.,]+)"
+        )
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE
+        )
+
+        if match:
+
+            return match.group(1).strip()
+
+        # ----------------------------------------------------
+        # Format lain
+        # ----------------------------------------------------
+
+        pattern = (
+            r"Jumlah Unit Yang Dicatat"
+            r"\s+"
+            r"([\d\.,]+)"
+        )
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE
+        )
+
+        if match:
+
+            return match.group(1).strip()
+
+        # ----------------------------------------------------
+        # Format English
+        # ----------------------------------------------------
+
+        pattern = (
+            r"Number of Listed Units"
+            r"\s+"
+            r"([\d\.,]+)"
+        )
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE
+        )
+
+        if match:
+
+            return match.group(1).strip()
+
+        return ""
+
+    # ========================================================
+    # EKSTRAK JUMLAH MAKSIMUM
+    # ========================================================
+
+    def extract_jumlah_maksimum(self, text):
+
+        patterns = [
+
+            r"Jumlah Maksimum Unit Penyertaan\s+([\d\.,]+)",
+
+            r"Jumlah Maksimum Unit Penyerataan\s+([\d\.,]+)",
+
+            r"Maximum Number of Units\s+([\d\.,]+)"
+        ]
+
+        for pattern in patterns:
+
+            match = re.search(
+                pattern,
+                text,
+                re.IGNORECASE
+            )
+
+            if match:
+
+                return match.group(1).strip()
+
+        return ""
+
+    # ========================================================
+    # EKSTRAK HARGA PERDANA
+    # ========================================================
+
+    def extract_harga_perdana(self, text):
+
+        pattern = (
+            r"Harga Perdana\s+"
+            r"(.*?)"
+            r"(?=Nilai Awal|"
+            r"Manajemen Investasi)"
+        )
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE |
+            re.DOTALL
+        )
+
+        if match:
+
+            value = self.clean_text(
+                match.group(1)
+            )
+
+            return value
+
+        # English
+
+        pattern = (
+            r"Initial Price\s+"
+            r"(.*?)"
+            r"(?=Initial Value|Investment Management)"
+        )
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE |
+            re.DOTALL
+        )
+
+        if match:
+
+            return self.clean_text(
+                match.group(1)
+            )
+
+        return ""
+
+    # ========================================================
+    # EKSTRAK NILAI AWAL
+    # ========================================================
+
+    def extract_nilai_awal(self, text):
+
+        pattern = (
+            r"Nilai Awal\s+"
+            r"([\d\.,]+)"
+        )
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE
+        )
+
+        if match:
+
+            return match.group(1).strip()
+
+        # English
+
+        pattern = (
+            r"Initial Value\s+"
+            r"([\d\.,]+)"
+        )
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE
+        )
+
+        if match:
+
+            return match.group(1).strip()
+
+        return ""
+
+    # ========================================================
+    # EKSTRAK MANAJEMEN INVESTASI
+    # ========================================================
+
+    def extract_manajemen(self, text):
+
+        pattern = (
+            r"Manajemen Investasi\s+"
+            r"(.*?)"
+            r"(?=Bank Kustodian)"
+        )
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE |
+            re.DOTALL
+        )
+
+        if match:
+
+            return self.clean_text(
+                match.group(1)
+            )
+
+        # English
+
+        pattern = (
+            r"Investment Management\s+"
+            r"(.*?)"
+            r"(?=Custodian Bank)"
+        )
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE |
+            re.DOTALL
+        )
+
+        if match:
+
+            return self.clean_text(
+                match.group(1)
+            )
+
+        return ""
+
+    # ========================================================
+    # EKSTRAK BANK KUSTODIAN
+    # ========================================================
+
+    def extract_kustodian(self, text):
+
+        pattern = (
+            r"Bank Kustodian\s+"
+            r"(.*?)"
+            r"(?=Dealer Participant)"
+        )
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE |
+            re.DOTALL
+        )
+
+        if match:
+
+            return self.clean_text(
+                match.group(1)
+            )
+
+        # English
+
+        pattern = (
+            r"Custodian Bank\s+"
+            r"(.*?)"
+            r"(?=Participating Dealers)"
+        )
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE |
+            re.DOTALL
+        )
+
+        if match:
+
+            return self.clean_text(
+                match.group(1)
+            )
+
+        return ""
+
+    # ========================================================
+    # EKSTRAK DEALER PARTISIPAN
+    # ========================================================
+
+    def extract_dealer(self, text):
+
+        pattern = (
+            r"Dealer Participant\s+"
+            r"(.*?)"
+            r"(?=Tanggal Mulai Perdagangan|"
+            r"Tanggal)"
+        )
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE |
+            re.DOTALL
+        )
+
+        if match:
+
+            return self.clean_text(
+                match.group(1)
+            )
+
+        # English
+
+        pattern = (
+            r"Participating Dealers\s+"
+            r"(.*?)"
+            r"(?=Initial Listing and Trading Date)"
+        )
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE |
+            re.DOTALL
+        )
+
+        if match:
+
+            return self.clean_text(
+                match.group(1)
+            )
+
+        return ""
+
+    # ========================================================
+    # EKSTRAK TANGGAL
+    # ========================================================
+
+    def extract_tanggal(self, text):
+
+        # ----------------------------------------------------
+        # Format Indonesia
+        # ----------------------------------------------------
+
+        bulan = (
+            "Januari|Februari|Maret|April|Mei|"
+            "Juni|Juli|Agustus|September|Oktober|"
+            "November|Desember"
+        )
+
+        pattern = (
+            r"Tanggal Mulai Perdagangan\s+"
+            r"(\d{1,2}\s+(?:"
+            + bulan +
+            r")\s+\d{4})"
+        )
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE
+        )
+
+        if match:
+
+            return match.group(1).strip()
+
+        # ----------------------------------------------------
+        # Kalau label tidak terbaca
+        # ----------------------------------------------------
+
+        pattern = (
+            r"Tanggal Pencatatan dan Perdagangan Perdana\s+"
+            r"(\d{1,2}\s+(?:"
+            + bulan +
+            r")\s+\d{4})"
+        )
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE
+        )
+
+        if match:
+
+            return match.group(1).strip()
+
+        return ""
+
+    # ========================================================
+    # EKSTRAK SEMUA FIELD ETF
+    # ========================================================
+
+    def extract_data_etf(self, text):
+
+        text = self.clean_text(text)
+
+        nama_kik = self.extract_nama_kik(text)
+
+        underlying_aset = self.extract_underlying(text)
+
+        kode_kik = self.extract_kode_kik(text)
+
+        jumlah_unit = self.extract_jumlah_unit(text)
+
+        jumlah_maksimum = self.extract_jumlah_maksimum(text)
+
+        harga_perdana = self.extract_harga_perdana(text)
+
+        nilai_awal = self.extract_nilai_awal(text)
+
+        manajemen = self.extract_manajemen(text)
+
+        kustodian = self.extract_kustodian(text)
+
+        dealer = self.extract_dealer(text)
+
+        tanggal = self.extract_tanggal(text)
+
+        return {
+
+            "nama_kik": nama_kik,
+
+            "underlying_aset": underlying_aset,
+
+            "kode_kik": kode_kik,
+
+            "jumlah_unit_yang_dicatat": jumlah_unit,
+
+            "jumlah_maksimum_unit_penyertaan": jumlah_maksimum,
+
+            "harga_perdana": harga_perdana,
+
+            "nilai_awal": nilai_awal,
+
+            "manajemen_investasi": manajemen,
+
+            "bank_kustodian": kustodian,
+
+            "dealer_partisipan": dealer,
+
+            "tanggal_mulai": tanggal
+        }
+
+    # ========================================================
+    # CEK FIELD WAJIB
+    # ========================================================
+
+    def validasi_data(self, data):
+
+        # Kode KIK wajib ada
+        if not data["kode_kik"]:
+
+            return False
+
+        # Nama KIK wajib ada
+        if not data["nama_kik"]:
+
+            return False
+
+        # Tanggal wajib ada
+        if not data["tanggal_mulai"]:
+
+            return False
+
+        return True
+
+    # ========================================================
+    # CEK DUPLIKAT
+    # ========================================================
+
+    def cek_duplikat(
+        self,
+        cursor,
+        kode_kik
+    ):
+
+        cursor.execute(
+            """
+            SELECT id
+            FROM insert_etf
+            WHERE kode_kik = ?
+            """,
+            (kode_kik,)
+        )
+
+        result = cursor.fetchone()
+
+        if result:
+
+            return True
+
+        return False
+
+    # ========================================================
+    # PROSES FILE
+    # ========================================================
+
+    def btn_proses_clicked(self):
+
+        folder_path = self.ui.txt_path.text().strip()
+
+        # ====================================================
+        # CEK FOLDER
+        # ====================================================
+
+        if not folder_path:
+
+            QMessageBox.warning(
+                self,
+                "Peringatan",
+                "Silakan pilih folder PDF terlebih dahulu."
+            )
+
+            return
+
+        if not os.path.exists(folder_path):
+
+            QMessageBox.warning(
+                self,
+                "Folder Tidak Ditemukan",
+                "Folder yang dipilih tidak ditemukan."
+            )
+
+            return
+
+        # ====================================================
+        # CARI SEMUA PDF
+        # ====================================================
+
+        pdf_files = []
+
+        for filename in os.listdir(folder_path):
+
+            if filename.lower().endswith(".pdf"):
+
+                pdf_files.append(filename)
+
+        # Urutkan nama file
+        pdf_files.sort()
+
+        # ====================================================
+        # CEK PDF
+        # ====================================================
+
+        if len(pdf_files) == 0:
+
+            QMessageBox.warning(
+                self,
+                "PDF Tidak Ditemukan",
+                "Tidak ada file PDF dalam folder tersebut."
+            )
+
+            return
+
+        # ====================================================
+        # COUNTER
+        # ====================================================
+
+        total_file = len(pdf_files)
+
+        berhasil = 0
+
+        duplikat = 0
+
+        gagal = 0
+
+        error_list = []
+
+        data_batch = []
+
+        # ====================================================
+        # DATABASE
+        # ====================================================
+
+        conn = None
+
+        try:
+
+            conn = sqlite3.connect(
+                self.db_path
+            )
+
+            cursor = conn.cursor()
+
+            # =================================================
+            # LOOP SEMUA PDF
+            # =================================================
+
+            for index, filename in enumerate(
+                pdf_files,
+                start=1
+            ):
+
+                print(
+                    f"[{index}/{total_file}] "
+                    f"Memproses {filename}"
+                )
+
+                file_path = os.path.join(
+                    folder_path,
+                    filename
+                )
+
+                # =============================================
+                # BACA PDF
+                # =============================================
+
+                text = self.baca_pdf(
+                    file_path
+                )
+
+                if not text:
+
+                    gagal += 1
+
+                    error_list.append(
+                        f"{filename} : PDF tidak dapat dibaca"
+                    )
+
+                    continue
+
+                # =============================================
+                # EKSTRAK DATA
+                # =============================================
+
+                data = self.extract_data_etf(
+                    text
+                )
+
+                print(
+                    "  Nama KIK       :",
+                    data["nama_kik"]
+                )
+
+                print(
+                    "  Kode KIK       :",
+                    data["kode_kik"]
+                )
+
+                print(
+                    "  Jumlah Unit    :",
+                    data["jumlah_unit_yang_dicatat"]
+                )
+
+                print(
+                    "  Nilai Awal     :",
+                    data["nilai_awal"]
+                )
+
+                print(
+                    "  Tanggal        :",
+                    data["tanggal_mulai"]
+                )
+
+                # =============================================
+                # VALIDASI
+                # =============================================
+
+                if not self.validasi_data(
+                    data
+                ):
+
+                    gagal += 1
+
+                    error_list.append(
+                        f"{filename} : "
+                        f"Data utama tidak ditemukan"
+                    )
+
+                    continue
+
+                # =============================================
+                # CEK DUPLIKAT
+                # =============================================
+
+                if self.cek_duplikat(
+                    cursor,
+                    data["kode_kik"]
+                ):
+
+                    duplikat += 1
+
+                    print(
+                        f"  DUPLIKAT: {data['kode_kik']}"
+                    )
+
+                    continue
+
+                # =============================================
+                # BUAT DATA TUPLE
+                # =============================================
+
+                row = (
+
+                    data["nama_kik"],
+
+                    data["underlying_aset"],
+
+                    data["kode_kik"],
+
+                    data[
+                        "jumlah_unit_yang_dicatat"
+                    ],
+
+                    data[
+                        "jumlah_maksimum_unit_penyertaan"
+                    ],
+
+                    data["harga_perdana"],
+
+                    data["nilai_awal"],
+
+                    data[
+                        "manajemen_investasi"
+                    ],
+
+                    data["bank_kustodian"],
+
+                    data["dealer_partisipan"],
+
+                    data["tanggal_mulai"]
+                )
+
+                # =============================================
+                # MASUKKAN KE BATCH
+                # =============================================
+
+                data_batch.append(
+                    row
+                )
+
+            # =================================================
+            # BATCH INSERT
+            # =================================================
+
+            if data_batch:
+
+                cursor.executemany(
+                    """
+                    INSERT INTO insert_etf (
+
+                        nama_kik,
+
+                        underlying_aset,
+
+                        kode_kik,
+
+                        jumlah_unit_yang_dicatat,
+
+                        jumlah_maksimum_unit_penyertaan,
+
+                        harga_perdana,
+
+                        nilai_awal,
+
+                        manajemen_investasi,
+
+                        bank_kustodian,
+
+                        dealer_partisipan,
+
+                        tanggal_mulai
+
+                    )
+
+                    VALUES (
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?
+                    )
+                    """,
+                    data_batch
+                )
+
+                # Commit hanya satu kali
+                conn.commit()
+
+                berhasil = len(
+                    data_batch
+                )
+
+            # =================================================
+            # HASIL
+            # =================================================
+
+            hasil = (
+                "PROSES BATCH INSERT SELESAI\n\n"
+
+                f"Total PDF     : {total_file}\n"
+
+                f"Berhasil      : {berhasil}\n"
+
+                f"Duplikat      : {duplikat}\n"
+
+                f"Gagal         : {gagal}"
+            )
+
+            # =================================================
+            # DETAIL ERROR
+            # =================================================
+
+            if error_list:
+
+                hasil += (
+                    "\n\nDETAIL FILE GAGAL:"
+                )
+
+                for error in error_list:
+
+                    hasil += (
+                        f"\n- {error}"
+                    )
+
+            QMessageBox.information(
+                self,
+                "Batch Insert ETF",
+                hasil
+            )
+
+        except Exception as e:
+
+            # =================================================
+            # ROLLBACK
+            # =================================================
+
+            if conn:
+
+                conn.rollback()
+
+            QMessageBox.critical(
+                self,
+                "Database Error",
+                "Terjadi kesalahan saat "
+                "memasukkan data:\n\n"
+                + str(e)
+            )
+
+        finally:
+
+            if conn:
+
+                conn.close()
+    
+
+
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
 
