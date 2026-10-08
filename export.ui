@@ -66,10 +66,22 @@
     <addaction name="actionInsert_2"/>
     <addaction name="actionEdit_2"/>
     <addaction name="actionBatch_Insert_2"/>
+    <addaction name="actionExport"/>
+   </widget>
+   <widget class="QMenu" name="menuSuspend">
+    <property name="title">
+     <string>Suspend</string>
+    </property>
+    <addaction name="actionInsert_3"/>
+    <addaction name="actionEdit_3"/>
+    <addaction name="actionDownloader_3"/>
+    <addaction name="actionBatch_Insert_3"/>
+    <addaction name="actionExport_3"/>
    </widget>
    <addaction name="menuUMA"/>
    <addaction name="menuTeoretis"/>
    <addaction name="menuETF"/>
+   <addaction name="menuSuspend"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionUMA">
@@ -135,6 +147,36 @@
   <action name="actionBatch_Insert_2">
    <property name="text">
     <string>Batch Insert</string>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="text">
+    <string>Export</string>
+   </property>
+  </action>
+  <action name="actionInsert_3">
+   <property name="text">
+    <string>Insert</string>
+   </property>
+  </action>
+  <action name="actionEdit_3">
+   <property name="text">
+    <string>Edit</string>
+   </property>
+  </action>
+  <action name="actionDownloader_3">
+   <property name="text">
+    <string>Downloader</string>
+   </property>
+  </action>
+  <action name="actionBatch_Insert_3">
+   <property name="text">
+    <string>Batch Insert</string>
+   </property>
+  </action>
+  <action name="actionExport_3">
+   <property name="text">
+    <string>Export</string>
    </property>
   </action>
  </widget>

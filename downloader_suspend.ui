@@ -38,7 +38,7 @@
      <string>Target start date</string>
     </property>
    </widget>
-   <widget class="QDateEdit" name="start_date">
+   <widget class="QDateEdit" name="date_edit">
     <property name="geometry">
      <rect>
       <x>140</x>
@@ -88,7 +88,7 @@
      </date>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_run">
+   <widget class="QPushButton" name="btn_run_3">
     <property name="geometry">
      <rect>
       <x>40</x>
@@ -122,7 +122,7 @@
      <string>Target end date</string>
     </property>
    </widget>
-   <widget class="QDateEdit" name="end_date">
+   <widget class="QDateEdit" name="date_edit_2">
     <property name="geometry">
      <rect>
       <x>420</x>
